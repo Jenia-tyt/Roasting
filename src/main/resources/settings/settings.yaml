@@ -1,3 +1,16 @@
 ---
 locale: "ru"
 valueTemperature: "°C"
+xAxis:
+  nameAxis: "x"
+  lowerBound: 0
+  upperBound: 15
+  tickUnit: 1
+  autoRanging: false
+yAxis:
+  nameAxis: "y"
+  lowerBound: 0
+  upperBound: 500
+  tickUnit: 25
+  autoRanging: false
+

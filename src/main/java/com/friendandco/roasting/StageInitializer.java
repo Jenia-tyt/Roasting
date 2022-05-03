@@ -9,7 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
 
 import static com.friendandco.roasting.CharApplication.StageReadyEvent;
 
-@Log4j2
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StageInitializer implements ApplicationListener<StageReadyEvent> {

@@ -2,8 +2,10 @@ package com.friendandco.roasting.component;
 
 import com.friendandco.roasting.constant.GlobalConstant;
 import com.friendandco.roasting.model.settings.Settings;
+import javafx.scene.control.ChoiceBox;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +18,22 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Log4j2
+@Slf4j
 @Component
 @AllArgsConstructor
 public class Translator {
     private final ConfigurableApplicationContext applicationContext;
+    private final Settings settings;
+
+    public void init(ChoiceBox<String> locale) {
+        List<String> nameLanguage = getAllLocale()
+                .stream()
+                .map(Locale::getLanguage)
+                .collect(Collectors.toList());
+
+        locale.getItems().addAll(nameLanguage);
+        locale.setValue(settings.getLocale().getLanguage());
+    }
 
     public String getMessage(String key) {
         ResourceBundle locale = getResourceBundleFromSettings();
@@ -40,7 +53,7 @@ public class Translator {
 
 
         } catch (IOException ioe) {
-            log.atError().log(ioe.getMessage());
+            log.error(ioe.getMessage());
             return new ArrayList<>();
         }
     }

@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.friendandco.roasting.model.settings.Settings;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-@Log4j2
+@Slf4j
 @NoArgsConstructor
 public class SettingsLoaderService {
     private final String nameSettingsFile = "settings/settings.yaml";
@@ -37,11 +37,15 @@ public class SettingsLoaderService {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
             if (!file.exists()) {
-                System.out.println("Create file: " + file.createNewFile());
+                if (file.createNewFile()) {
+                    log.info("Create file: " + file.getName());
+                } else {
+                    log.warn("File " + file.getName() + "was not create");
+                }
             }
             objectMapper.writeValue(file, settings);
         } catch (IOException e) {
-            log.atError().log(String.format("Settings can't write in file %s", nameSettingsFile), e.getMessage());
+            log.error(String.format("Settings can't write in file %s", nameSettingsFile), e.getMessage());
         }
     }
 
@@ -49,8 +53,8 @@ public class SettingsLoaderService {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
             return objectMapper.readValue(settingsUrl, Settings.class);
-        } catch (IOException e) {
-            log.atError().log(String.format("Settings can't load from file %s", nameSettingsFile), e.getMessage());
+        } catch (Exception e) {
+            log.error(String.format("Settings can't load from file %s", nameSettingsFile), e.getMessage());
             return getDefaultSettings();
         }
     }

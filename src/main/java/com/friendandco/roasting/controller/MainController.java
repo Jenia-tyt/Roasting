@@ -3,15 +3,13 @@ package com.friendandco.roasting.controller;
 import com.friendandco.roasting.StageInitializer;
 import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.model.settings.Settings;
-import com.friendandco.roasting.service.InfoService;
-import com.friendandco.roasting.service.LineChartService;
-import com.friendandco.roasting.service.TemperatureDrawService;
-import com.friendandco.roasting.service.TimerService;
-import com.friendandco.roasting.utils.DateTimeUtils;
+import com.friendandco.roasting.service.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -24,11 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 @Setter
 @Getter
@@ -38,42 +32,36 @@ import java.util.stream.Collectors;
 public class MainController implements Initializable {
     @FXML private TextField info;
     @FXML private BorderPane root;
+    @FXML private NumberAxis xAxis;
+    @FXML private NumberAxis yAxis;
     @FXML private TextField timerArea;
     @FXML private TextField tempField;
     @FXML private ChoiceBox<String> locale;
-    @FXML private LineChart<Number, Number> chart;
+    @FXML private LineChart<Double, Double> chart;
+    @FXML private ListView<String> listCharts;
 
     @Autowired private ConfigurableApplicationContext applicationContext;
     @Autowired private TemperatureDrawService temperatureDrawService;
+    @Autowired private LineChartDrawService lineChartDrawService;
     @Autowired private StageInitializer stageInitializer;
-    @Autowired private LineChartService lineChartService;
+    @Autowired private ChartLoadService chartLoadService;
     @Autowired private TimerService timerService;
-    @Autowired private Translator translator;
     @Autowired private InfoService infoService;
+    @Autowired private Translator translator;
     @Autowired private Settings settings;
-
-    private LocalTime timer = LocalTime.MIDNIGHT;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        List<String> nameLanguage = translator.getAllLocale()
-                .stream()
-                .map(Locale::getLanguage)
-                .collect(Collectors.toList());
-
-        locale.getItems().addAll(nameLanguage);
-        locale.setValue(settings.getLocale().getLanguage());
-
-        lineChartService.init(chart);
-
-        timerArea.setText(DateTimeUtils.getTimerTime(timer));
+        translator.init(locale);
+        chartLoadService.init(listCharts, chart);
+        lineChartDrawService.init(chart, xAxis, yAxis);
         timerService.init(timerArea);
-
         temperatureDrawService.init(tempField);
-
         infoService.init(info);
     }
 
+    //TODO
+    // При локализации пропадает график надо  брать данные
     @FXML
     public void onChoseLocale() throws IOException {
         if (root.getScene() == null) {
@@ -86,22 +74,37 @@ public class MainController implements Initializable {
         stageInitializer.initRootStage(stage, bundle);
     }
 
-    //TODO туда передавать шаг который можно выставить в настройках, по умолчнию надо выставить одну секунду
     @FXML
     public void startShowChart() {
         timerService.start();
-        lineChartService.start();
+        lineChartDrawService.start();
     }
 
     @FXML
     public void pauseShowChart() {
         timerService.pause();
-        lineChartService.pause();
+        lineChartDrawService.pause();
     }
 
     @FXML
     public void stopShowChart() {
         timerService.stop();
-        lineChartService.stop();
+        lineChartDrawService.stop();
+    }
+
+    @FXML
+    public void clearChart() {
+        timerService.stop();
+        timerService.clear();
+        lineChartDrawService.stop();
+        lineChartDrawService.clear();
+        chartLoadService.loadItems();
+        chartLoadService.clearLoadChartsUuids();
+    }
+
+    @FXML
+    public void save(){
+        stopShowChart();
+        lineChartDrawService.save();
     }
 }

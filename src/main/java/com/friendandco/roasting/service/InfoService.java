@@ -27,7 +27,7 @@ public class InfoService {
         this.isInitDone = true;
     }
 
-    public void showWarning(String message) {
+    public void showError(String message, long time) {
         Task<Void> draw = new Task<>() {
             @Override
             protected Void call() {
@@ -36,6 +36,33 @@ public class InfoService {
                     textField.setStyle("-fx-background-color: rgba(255, 69, 0)");
                     isShow = true;
                 });
+                try {
+                    Thread.sleep(time);
+                    clear();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        threadPool.getService().submit(draw);
+    }
+
+    public void showWarning(String message, long time) {
+        Task<Void> draw = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    textField.setText(translator.getMessage("warning") + ": " + message);
+                    textField.setStyle("-fx-background-color: rgb(255,234,0)");
+                    isShow = true;
+                });
+                try {
+                    Thread.sleep(time);
+                    clear();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return null;
             }
         };
@@ -52,7 +79,7 @@ public class InfoService {
 
     public void clear() {
         if (isShowing()) {
-            Platform.runLater(()-> {
+            Platform.runLater(() -> {
                 textField.clear();
                 textField.setStyle("-fx-background-color: rgb(218,221,224)");
                 isShow = false;

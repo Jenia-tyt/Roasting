@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -35,48 +34,37 @@
                            <children>
                               <LineChart id="chart" fx:id="chart" alternativeColumnFillVisible="true" blendMode="DARKEN" nodeOrientation="LEFT_TO_RIGHT" prefHeight="747.0" prefWidth="802.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <xAxis>
-                                  <CategoryAxis side="BOTTOM" />
+                                  <NumberAxis side="BOTTOM" fx:id="xAxis" />
                                 </xAxis>
                                 <yAxis>
-                                  <NumberAxis side="LEFT" />
+                                  <NumberAxis fx:id="yAxis" side="LEFT" />
                                 </yAxis>
                               </LineChart>
                            </children>
                         </AnchorPane>
                       <AnchorPane maxWidth="350.0" minHeight="0.0" minWidth="350.0" prefHeight="744.0" prefWidth="652.0">
                            <children>
-                              <VBox alignment="BOTTOM_CENTER" layoutX="58.0" layoutY="133.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox alignment="TOP_CENTER" cache="true" cacheHint="SPEED" depthTest="ENABLE" layoutX="58.0" layoutY="133.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <TextField id="timerArea" fx:id="timerArea" alignment="CENTER" editable="false" prefHeight="200.0" prefWidth="200.0">
+                                    <TextField id="timerArea" fx:id="timerArea" alignment="CENTER" editable="false" prefHeight="126.0" prefWidth="350.0">
                                        <font>
                                           <Font name="Arial Narrow Bold" size="90.0" />
                                        </font></TextField>
-                                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="305.0" prefWidth="277.0">
-                                      <items>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                                             <children>
-                                                <ComboBox layoutX="55.0" layoutY="14.0" prefWidth="150.0" visibleRowCount="5" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                <HBox layoutY="38.0" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
-                                                   <children>
-                                                      <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="clear" HBox.hgrow="ALWAYS" />
-                                                      <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="save" HBox.hgrow="ALWAYS" />
-                                                   </children>
-                                                </HBox>
-                                             </children>
-                                          </AnchorPane>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                                             <children>
-                                                <TextArea layoutX="44.0" layoutY="-11.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
-                                                <Label alignment="CENTER" layoutX="123.0" layoutY="14.0" text="delta" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                             </children>
-                                          </AnchorPane>
-                                      </items>
-                                    </SplitPane>
+                                    <Label text="Label" />
+                                    <ListView id="test" fx:id="listCharts" prefHeight="194.0" prefWidth="350.0" />
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#clearChart" text="clear" HBox.hgrow="ALWAYS" />
+                                          <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#save" text="save" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                    <Label text="Label" />
+                                    <TextArea prefHeight="146.0" prefWidth="350.0" />
                                     <SplitPane dividerPositions="0.5" mouseTransparent="true" prefHeight="160.0" prefWidth="200.0">
                                       <items>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                              <children>
-                                                <Label alignment="CENTER" layoutX="53.0" layoutY="22.0" text="t coffe" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <Label alignment="CENTER" layoutX="53.0" layoutY="22.0" prefHeight="26.0" prefWidth="171.0" text="t coffe" AnchorPane.bottomAnchor="106.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                 <TextField id="tempField" fx:id="tempField" alignment="CENTER" layoutY="47.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
                                                    <font>
                                                       <Font size="60.0" />
@@ -85,7 +73,7 @@
                                           </AnchorPane>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                              <children>
-                                                <Label alignment="CENTER" layoutX="52.0" layoutY="14.0" text="t graf" AnchorPane.bottomAnchor="130.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <Label alignment="CENTER" layoutX="52.0" layoutY="14.0" prefHeight="25.0" prefWidth="171.0" text="t graf" AnchorPane.bottomAnchor="107.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                 <TextField prefHeight="145.0" prefWidth="152.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0" />
                                              </children>
                                           </AnchorPane>

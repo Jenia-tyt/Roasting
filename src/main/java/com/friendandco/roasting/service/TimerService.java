@@ -5,6 +5,7 @@ import com.friendandco.roasting.utils.DateTimeUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextField;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,23 +18,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TimerService {
     private final ThreadPoolFix threadPool;
 
-    private Task<Void> showTimer;
     private TextField textArea;
+    @Getter
+    private AtomicInteger count = new AtomicInteger(0);
 
     private boolean pause = false;
     private boolean stop = true;
 
     public void init(TextField textArea) {
         this.textArea = textArea;
+        textArea.setText(DateTimeUtils.getTimerTime(LocalTime.MIDNIGHT));
     }
 
     public void start() {
         if (stop) {
             stop = false;
-            showTimer = new Task<>() {
+            Task<Void> showTimer = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    AtomicInteger count = new AtomicInteger(0);
+                    count = new AtomicInteger(0);
                     LocalTime timer = LocalTime.MIDNIGHT;
                     while (!stop) {
                         if (!pause) {
@@ -62,6 +65,22 @@ public class TimerService {
 
     public void stop() {
         stop = !stop;
-        showTimer.cancel();
+    }
+
+    public void clear() {
+        Task<Void> clear = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() ->
+                        textArea.setText(
+                                DateTimeUtils.getTimerTime(
+                                        LocalTime.MIDNIGHT
+                                )
+                        )
+                );
+                return null;
+            }
+        };
+        threadPool.getService().submit(clear);
     }
 }
