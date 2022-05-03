@@ -1,13 +1,16 @@
 package com.friendandco.roasting.controller;
 
 import com.friendandco.roasting.StageInitializer;
+import com.friendandco.roasting.component.CssStyleProvider;
 import com.friendandco.roasting.component.Translator;
+import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.service.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -38,11 +41,12 @@ public class MainController implements Initializable {
     @FXML private TextField tempField;
     @FXML private ChoiceBox<String> locale;
     @FXML private LineChart<Double, Double> chart;
-    @FXML private ListView<String> listCharts;
+    @FXML private ListView<ItemChart> listCharts;
 
     @Autowired private ConfigurableApplicationContext applicationContext;
     @Autowired private TemperatureDrawService temperatureDrawService;
     @Autowired private LineChartDrawService lineChartDrawService;
+    @Autowired private CssStyleProvider cssStyleProvider;
     @Autowired private StageInitializer stageInitializer;
     @Autowired private ChartLoadService chartLoadService;
     @Autowired private TimerService timerService;
@@ -58,6 +62,8 @@ public class MainController implements Initializable {
         timerService.init(timerArea);
         temperatureDrawService.init(tempField);
         infoService.init(info);
+
+        setUpCss();
     }
 
     //TODO
@@ -106,5 +112,9 @@ public class MainController implements Initializable {
     public void save(){
         stopShowChart();
         lineChartDrawService.save();
+    }
+
+    private void setUpCss() {
+        cssStyleProvider.getListViewCss().ifPresent(css -> listCharts.getStylesheets().add(css));
     }
 }

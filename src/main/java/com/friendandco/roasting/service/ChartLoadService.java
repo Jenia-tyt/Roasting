@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.model.chart.Chart;
+import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.chart.Point;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
@@ -14,6 +15,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.MouseButton;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,33 +44,34 @@ public class ChartLoadService {
     private final ThreadPoolFix threadPool;
     private final InfoService infoService;
 
-    private ListView<String> listView;
+    private ListView<ItemChart> listView;
     private LineChart<Double, Double> lineChart;
     private ContextMenu cm;
     @Getter
-    private final ConcurrentHashMap<UUID, LineChartDone> loadCharts = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap();
 
 
     public void init(
-            ListView<String> listView,
+            ListView<ItemChart> listView,
             LineChart<Double, Double> lineChart
     ) {
         this.listView = listView;
         this.lineChart = lineChart;
         initContextMenu();
 
+        listView.setCellFactory(CheckBoxListCell.forListView(ItemChart::onProperty));
         listView.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton() && event.getClickCount() == 2) {
                 chooseChart();
             } else if (MouseButton.SECONDARY == event.getButton() && isChooseItem()) {
                 cm.show(listView, event.getScreenX(), event.getScreenY());
-            }
-            else if (MouseButton.PRIMARY == event.getButton() && event.getClickCount() == 1) {
+            } else if (MouseButton.PRIMARY == event.getButton() && event.getClickCount() == 1) {
                 if (cm.isShowing()) {
                     cm.hide();
                 }
             }
         });
+
         loadItems();
     }
 
@@ -91,15 +97,31 @@ public class ChartLoadService {
         loadItems();
     }
 
-    //TODO здесь надо изменять стиль выбранного элемента
     private void chooseChart() {
         Optional.ofNullable(listView.getSelectionModel().selectedItemProperty().getValue())
-                .ifPresent(name -> fillChart(loadChart(name)));
+                .ifPresent(itemChart -> itemChart.setOn(!itemChart.isOn()));
+    }
+
+    private void removeLoadChart(String name) {
+        Task<Void> test = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    lineChart.getData().remove(loadCharts.get(name));
+                    loadCharts.remove(name);
+                });
+                return null;
+            }
+        };
+        threadPool.getService().submit(test);
     }
 
     private void fillChart(LineChartDone chartDone) {
         if (checkLoadChart(chartDone)) {
-            infoService.showWarning(translator.getMessage("chart.it.is.same"), 5000);
+            infoService.showWarning(
+                    translator.getMessage("chart.it_is_same"),
+                    5000
+            );
             return;
         }
         Task<Void> draw = new Task<>() {
@@ -117,9 +139,9 @@ public class ChartLoadService {
                                     )
                             );
                             lineChart.getData().add(dataChart);
+                            loadCharts.put(chartDone.getName(), dataChart);
                         }
                 );
-                loadCharts.put(chartDone.getUuid(), chartDone);
                 return null;
             }
         };
@@ -158,16 +180,28 @@ public class ChartLoadService {
     }
 
     private boolean checkLoadChart(LineChartDone chartDone) {
-        return loadCharts.containsKey(chartDone.getUuid());
+        return loadCharts.containsKey(chartDone.getName());
     }
 
-    private List<String> getNameCharts() {
+    private List<ItemChart> getNameCharts() {
         try (Stream<Path> paths = Files.walk(Paths.get(pathPackageForSave))) {
             return paths
                     .filter(Files::isRegularFile)
                     .map(path -> path.getFileName().toString())
                     .filter(name -> name.endsWith(".yaml"))
                     .map(name -> name.replace(".yaml", ""))
+                    .map(name -> new ItemChart(name, false))
+                    .peek(itemChart ->
+                            itemChart.onProperty().addListener(
+                                    (observable, oldValue, newValue) -> {
+                                        if (newValue) {
+                                            fillChart(loadChart(itemChart.getName()));
+                                        } else {
+                                            removeLoadChart(itemChart.getName());
+                                        }
+                                    }
+                            )
+                    )
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Package can't read" + pathPackageForSave);
@@ -179,7 +213,10 @@ public class ChartLoadService {
     private void write(LineChartDone lineChartDone) {
         Random r = new Random();
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        String fullPath = pathPackageForSave + lineChartDone.getName() + r.nextInt() + ".yaml";
+        //TODO на имени завязана логика удаления загурежнных графиков
+        String saveName = lineChartDone.getName() + r.nextInt();
+        lineChartDone.setName(saveName);
+        String fullPath = pathPackageForSave + saveName + ".yaml";
         File file = new File(fullPath);
         try {
             if (!file.exists()) {
