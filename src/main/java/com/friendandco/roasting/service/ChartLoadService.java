@@ -7,10 +7,12 @@ import com.friendandco.roasting.model.chart.Chart;
 import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.chart.Point;
+import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
@@ -27,10 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,11 +39,14 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ChartLoadService {
     private final String pathPackageForSave = "./src/main/resources/charts/";
+    private final Settings settings;
     private final Translator translator;
-    private final ThreadPoolFix threadPool;
     private final InfoService infoService;
+    private final ThreadPoolFix threadPool;
 
     private ListView<ItemChart> listView;
+    private NumberAxis xAxis;
+    private NumberAxis yAxis;
     private LineChart<Double, Double> lineChart;
     private ContextMenu cm;
     @Getter
@@ -53,10 +55,14 @@ public class ChartLoadService {
 
     public void init(
             ListView<ItemChart> listView,
-            LineChart<Double, Double> lineChart
+            LineChart<Double, Double> lineChart,
+            NumberAxis xAxis,
+            NumberAxis yAxis
     ) {
         this.listView = listView;
         this.lineChart = lineChart;
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
         initContextMenu();
 
         listView.setCellFactory(CheckBoxListCell.forListView(ItemChart::onProperty));
@@ -128,6 +134,8 @@ public class ChartLoadService {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
+                            prepareAxis(chartDone);
+
                             XYChart.Series<Double, Double> dataChart = new XYChart.Series<>();
                             dataChart.setName(chartDone.getName());
                             chartDone.getChart().getPoints().forEach(point ->
@@ -244,5 +252,19 @@ public class ChartLoadService {
 
         cm.getItems().add(delete);
         cm.setAutoFix(true);
+    }
+
+    private void prepareAxis(LineChartDone chartDone) {
+        LinkedList<Point> points = chartDone.getChart().getPoints();
+        Optional.ofNullable(points.getLast())
+                .ifPresent(point -> {
+                    if (point.getX() > xAxis.getUpperBound()) {
+                        xAxis.setUpperBound(point.getX());
+                    }
+
+                    if (point.getY() > yAxis.getUpperBound()) {
+                        yAxis.setUpperBound(point.getY());
+                    }
+                });
     }
 }

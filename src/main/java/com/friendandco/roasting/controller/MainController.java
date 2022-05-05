@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -57,7 +56,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         translator.init(locale);
-        chartLoadService.init(listCharts, chart);
+        chartLoadService.init(listCharts, chart, xAxis, yAxis);
         lineChartDrawService.init(chart, xAxis, yAxis);
         timerService.init(timerArea);
         temperatureDrawService.init(tempField);

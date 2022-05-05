@@ -42,18 +42,7 @@ public class LineChartDrawService {
         // 1) сюда добавить название кофе которые жарится
         // 3) сделать настройку графика в кладке настройки
         // Подсчет откланения
-        prepareAxis(
-                xAxis,
-                settings.getXAxis(),
-                String.format(translator.getMessage("chart.x"), translator.getMessage("time.value"))
-        );
-
-        prepareAxis(
-                yAxis,
-                settings.getYAxis(),
-                String.format(translator.getMessage("chart.y"), settings.getValueTemperature())
-        );
-
+        prepareAxisFromSettings();
         lineChart.setCreateSymbols(false);
         lineChart.setTitle(DateTimeUtils.today());
         dataChart = new XYChart.Series<>();
@@ -109,7 +98,10 @@ public class LineChartDrawService {
         Task<Void> clear = new Task<>() {
             @Override
             protected Void call() {
-                Platform.runLater(() -> clearDate(true));
+                Platform.runLater(() -> {
+                    prepareAxisFromSettings();
+                    clearDate(true);
+                });
                 return null;
             }
         };
@@ -146,5 +138,19 @@ public class LineChartDrawService {
         axis.setTickUnit(settingsAxis.getTickUnit());
         axis.setLabel(label);
         axis.setAutoRanging(settingsAxis.isAutoRanging());
+    }
+
+    private void prepareAxisFromSettings() {
+        prepareAxis(
+                xAxis,
+                settings.getXAxis(),
+                String.format(translator.getMessage("chart.x"), translator.getMessage("time.value"))
+        );
+
+        prepareAxis(
+                yAxis,
+                settings.getYAxis(),
+                String.format(translator.getMessage("chart.y"), settings.getValueTemperature())
+        );
     }
 }

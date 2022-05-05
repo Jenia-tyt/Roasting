@@ -5,13 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Chart implements Serializable {
     private String name;
-    private List<Point> points = new ArrayList<>();
+    private LinkedList<Point> points = new LinkedList<>();
 }
