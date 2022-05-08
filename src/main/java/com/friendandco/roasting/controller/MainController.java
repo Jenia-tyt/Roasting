@@ -39,7 +39,7 @@ public class MainController implements Initializable {
     @FXML private TextField timerArea;
     @FXML private TextField tempField;
     @FXML private ChoiceBox<String> locale;
-    @FXML private LineChart<Double, Double> chart;
+    @FXML private LineChart<Double, Integer> chart;
     @FXML private ListView<ItemChart> listCharts;
 
     @Autowired private ConfigurableApplicationContext applicationContext;

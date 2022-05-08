@@ -8,8 +8,10 @@ import javafx.concurrent.Task;
 import javafx.scene.control.TextField;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class InfoService {
@@ -27,12 +29,13 @@ public class InfoService {
         this.isInitDone = true;
     }
 
+    //TODO вынести все css в отдельный файл
     public void showError(String message, long time) {
         Task<Void> draw = new Task<>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    textField.setText(translator.getMessage("warning") + ": " + message);
+                    textField.setText(translator.getMessage("error") + ": " + message);
                     textField.setStyle("-fx-background-color: rgba(255, 69, 0)");
                     isShow = true;
                 });
@@ -40,7 +43,7 @@ public class InfoService {
                     Thread.sleep(time);
                     clear();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Error in show error", e);
                 }
                 return null;
             }
@@ -61,7 +64,28 @@ public class InfoService {
                     Thread.sleep(time);
                     clear();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("Error in show warning", e);
+                }
+                return null;
+            }
+        };
+        threadPool.getService().submit(draw);
+    }
+
+    public void showOk(String message, long time) {
+        Task<Void> draw = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    textField.setText(translator.getMessage("successfully") + ": " + message);
+                    textField.setStyle("-fx-background-color: rgb(5,197,60)");
+                    isShow = true;
+                });
+                try {
+                    Thread.sleep(time);
+                    clear();
+                } catch (InterruptedException e) {
+                    log.error("Error in show ok", e);
                 }
                 return null;
             }

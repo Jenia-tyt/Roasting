@@ -47,15 +47,15 @@ public class ChartLoadService {
     private ListView<ItemChart> listView;
     private NumberAxis xAxis;
     private NumberAxis yAxis;
-    private LineChart<Double, Double> lineChart;
+    private LineChart<Double, Integer> lineChart;
     private ContextMenu cm;
     @Getter
-    private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String, XYChart.Series<Double, Integer>> loadCharts = new ConcurrentHashMap();
 
 
     public void init(
             ListView<ItemChart> listView,
-            LineChart<Double, Double> lineChart,
+            LineChart<Double, Integer> lineChart,
             NumberAxis xAxis,
             NumberAxis yAxis
     ) {
@@ -82,18 +82,18 @@ public class ChartLoadService {
     }
 
     //TODO добавить проверку что есть что сохранять на пустые даные
-    public void save(LineChart<Double, Double> lineChart) {
+    public void save(LineChart<Double, Integer> lineChart) {
         LineChartDone data = new LineChartDone();
         data.setName(lineChart.getTitle());
 
         lineChart.getData().forEach(s -> {
             Chart chart = new Chart();
             chart.setName(s.getName());
-            s.getData().forEach(doubleDoubleData ->
+            s.getData().forEach(intData ->
                     chart.getPoints().add(
                             new Point(
-                                    doubleDoubleData.getXValue(),
-                                    doubleDoubleData.getYValue()
+                                    intData.getXValue(),
+                                    intData.getYValue()
                             )
                     )
             );
@@ -136,7 +136,7 @@ public class ChartLoadService {
                 Platform.runLater(() -> {
                             prepareAxis(chartDone);
 
-                            XYChart.Series<Double, Double> dataChart = new XYChart.Series<>();
+                            XYChart.Series<Double, Integer> dataChart = new XYChart.Series<>();
                             dataChart.setName(chartDone.getName());
                             chartDone.getChart().getPoints().forEach(point ->
                                     dataChart.getData().add(

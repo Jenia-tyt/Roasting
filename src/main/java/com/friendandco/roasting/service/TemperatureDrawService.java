@@ -23,7 +23,7 @@ public class TemperatureDrawService {
         initDone = true;
     }
 
-    public void draw(Double temp) {
+    public void draw(int temp) {
         Task<Void> drawTempTask = new Task<>() {
             @Override
             protected Void call() {
@@ -32,6 +32,19 @@ public class TemperatureDrawService {
                                 temp
                         )
                 ));
+                return null;
+            }
+        };
+        threadPool.getService().submit(drawTempTask);
+    }
+
+    public void clear() {
+        Task<Void> drawTempTask = new Task<>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() ->
+                        tempField.setText("")
+                );
                 return null;
             }
         };

@@ -30,10 +30,10 @@ public class LineChartDrawService {
     private Task<Void> drawChart;
     private boolean stop = true;
     private boolean pause = false;
-    private LineChart<Double, Double> lineChart;
-    private XYChart.Series<Double, Double> dataChart;
+    private LineChart<Double, Integer> lineChart;
+    private XYChart.Series<Double, Integer> dataChart;
 
-    public void init(LineChart<Double, Double> lineChart, NumberAxis xAxis, NumberAxis yAxis) {
+    public void init(LineChart<Double, Integer> lineChart, NumberAxis xAxis, NumberAxis yAxis) {
         this.lineChart = lineChart;
         this.xAxis = xAxis;
         this.yAxis = yAxis;
@@ -60,7 +60,7 @@ public class LineChartDrawService {
                     while (!stop) {
                         if (!pause) {
                             double xValue = (double) timerService.getCount().get() / SECONDS_IN_MINUTE;
-                            double yValue = arduinoService.getCurrentTemperature();
+                            int yValue = arduinoService.getCurrentTemperature();
                             Platform.runLater(() ->
                                     dataChart.getData().add(
                                             new XYChart.Data<>(

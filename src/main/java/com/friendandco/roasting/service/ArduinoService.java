@@ -2,6 +2,7 @@ package com.friendandco.roasting.service;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.friendandco.roasting.component.Translator;
+import com.friendandco.roasting.constant.GlobalConstant;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import javafx.concurrent.Task;
 import lombok.Getter;
@@ -9,7 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+
+import static com.friendandco.roasting.constant.GlobalConstant.IO_USB_PORT;
 
 @Slf4j
 @Getter
@@ -21,75 +27,85 @@ public class ArduinoService extends Task<Void> {
     private final ThreadPoolFix threadPool;
     private final TemperatureDrawService temperatureDrawService;
 
-    private volatile double currentTemperature;
-    private boolean connect = true;
+    private volatile int currentTemperature;
+    private boolean connect = false;
+    private SerialPort port;
+    private InputStream inputStream;
+    private boolean readyReadTemp = false;
 
     @Override
-    protected Void call()  {
-        //TODO реализовтаь
-        // тут метод который уставливает конет
-
-        test();
-
-
-        Double value = 0.0;
-        while (true) {
-
-            try {
-
-
-                if (connect) {
-                    currentTemperature = value;
-                    if (temperatureDrawService.isInitDone()) {
-                        temperatureDrawService.draw(currentTemperature);
-                    }
-                    value = value + 1;
-                } else {
-                    //TODO
-                    // мы показываем попа
-                    // пытаемся установить конект снова
-                    if (!infoService.isShowing()) {
-                        infoService.showError(
-                                translator.getMessage("thermocouple.not_connect"),
-                                1000
-                        );
-                    }
-                }
-                Thread.sleep(1000);
-
-            } catch (Exception e) {
-                System.out.println("ERROR_FIRST" + e);
+    protected Void call() {
+        try {
+            createConnect();
+            if (connect) {
+                readTemperature();
+            } else {
+                createConnect();
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            log.error("Error in ArduinoService", e);
         }
+        return null;
     }
 
-    private void test() {
-        try {
-            SerialPort[] commPorts = SerialPort.getCommPorts();
-            System.out.println("Select a port:");
-            int i = 1;
-            for(SerialPort port : commPorts) {
-                System.out.println(i++ + ". " + port.getSystemPortName());
+    private void createConnect() throws Exception {
+        SerialPort[] commPorts = SerialPort.getCommPorts();
+        for (SerialPort serialPort : commPorts) {
+            if (IO_USB_PORT.equals(serialPort.getDescriptivePortName())) {
+                if (serialPort.openPort()) {
+                    port = serialPort;
+                    connect = true;
+                    serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+                    inputStream = serialPort.getInputStream();
+                    readTemperature();
+                    return;
+                }
             }
-            Scanner s = new Scanner(System.in);
-            int chosenPort = s.nextInt();
+        }
+        connect = false;
+        infoService.showError(
+                translator.getMessage("thermocouple.not_connect"),
+                2000
+        );
+        Thread.sleep(2000);
+        createConnect();
+    }
 
-            SerialPort port = commPorts[chosenPort - 1];
-            if(port.openPort()) {
-                System.out.println("Successfully opened the port.");
-            } else {
-                System.out.println("Unable to open the port.");
-                return;
+    //TODO замена температуры и поправочный коэффициент если термо пара вообще ни чего не показывает
+    private void readTemperature() throws Exception {
+        try (Scanner scanner = new Scanner(inputStream)) {
+            while (connect) {
+                String value = scanner.nextLine();
+                Matcher matcher = GlobalConstant.PATTERN_TEMPERATURE.matcher(value);
+                if (!readyReadTemp && GlobalConstant.READY_READ_TEMP.equals(value)) {
+                    readyReadTemp = true;
+                    infoService.showOk(
+                            translator.getMessage("thermocouple.connect"),
+                            5000
+                    );
+                }
+                if (matcher.find() && temperatureDrawService.isInitDone() && readyReadTemp) {
+                    currentTemperature = Integer.parseInt(matcher.group(GlobalConstant.CELSIUS));
+                    temperatureDrawService.draw(currentTemperature);
+                }
+                Thread.sleep(1000);
             }
-            port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-
-            Scanner data = new Scanner(port.getInputStream());
-            System.out.println(data.next());
-            while (true) {
-                System.out.println(data.nextLine());
-            }
-        } catch (Exception e) {
-            System.out.println("ERROR_SECOND : " + e);
+            createConnect();
+        } catch (NoSuchElementException e) {
+            port.closePort();
+            inputStream.close();
+            temperatureDrawService.clear();
+            currentTemperature = 0;
+            connect = false;
+            readyReadTemp = false;
+            infoService.showError(
+                    translator.getMessage("thermocouple.not_connect"),
+                    2000
+            );
+            log.error("Data scanner thermocouple can not read value", e);
+            createConnect();
         }
     }
 }
