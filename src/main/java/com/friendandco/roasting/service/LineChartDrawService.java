@@ -41,7 +41,7 @@ public class LineChartDrawService {
         //TODO
         // 1) сюда добавить название кофе которые жарится
         // 3) сделать настройку графика в кладке настройки
-        // Подсчет откланения
+        // Подсчет отклонения
         prepareAxisFromSettings();
         lineChart.setCreateSymbols(false);
         lineChart.setTitle(DateTimeUtils.today());
@@ -128,18 +128,6 @@ public class LineChartDrawService {
         yAxis.setAutoRanging(false);
     }
 
-    private void prepareAxis(
-            NumberAxis axis,
-            SettingsAxis settingsAxis,
-            String label
-    ) {
-        axis.setLowerBound(settingsAxis.getLowerBound());
-        axis.setUpperBound(settingsAxis.getUpperBound());
-        axis.setTickUnit(settingsAxis.getTickUnit());
-        axis.setLabel(label);
-        axis.setAutoRanging(settingsAxis.isAutoRanging());
-    }
-
     private void prepareAxisFromSettings() {
         prepareAxis(
                 xAxis,
@@ -152,5 +140,17 @@ public class LineChartDrawService {
                 settings.getYAxis(),
                 String.format(translator.getMessage("chart.y"), settings.getValueTemperature())
         );
+    }
+
+    private void prepareAxis(
+            NumberAxis axis,
+            SettingsAxis settingsAxis,
+            String label
+    ) {
+        axis.setLowerBound(settingsAxis.getLowerBound());
+        axis.setUpperBound(settingsAxis.getUpperBound());
+        axis.setTickUnit(settingsAxis.getTickUnit());
+        axis.setLabel(label);
+        axis.setAutoRanging(settingsAxis.isAutoRanging());
     }
 }

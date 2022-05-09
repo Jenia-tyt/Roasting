@@ -82,7 +82,7 @@ public class InfoService {
                     isShow = true;
                 });
                 try {
-                    Thread.sleep(time);
+                    Thread.sleep(time); //TODO  выпадает ошибка разобраться
                     clear();
                 } catch (InterruptedException e) {
                     log.error("Error in show ok", e);

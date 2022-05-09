@@ -12,6 +12,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -30,18 +31,21 @@ import java.util.ResourceBundle;
 @Getter
 @Component
 @NoArgsConstructor
-@SuppressWarnings("all")
+@SuppressWarnings("all") //TODO убрать только одно предупреждение не все
 public class MainController implements Initializable {
     @FXML private TextField info;
     @FXML private BorderPane root;
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
+    @FXML private TextField delta;
     @FXML private TextField timerArea;
     @FXML private TextField tempField;
     @FXML private ChoiceBox<String> locale;
-    @FXML private LineChart<Double, Integer> chart;
+    @FXML private ChoiceBox<String> normalChart;
     @FXML private ListView<ItemChart> listCharts;
+    @FXML private LineChart<Double, Integer> chart;
 
+    @Autowired private DifferenceCalculationService differenceCalculationService;
     @Autowired private ConfigurableApplicationContext applicationContext;
     @Autowired private TemperatureDrawService temperatureDrawService;
     @Autowired private LineChartDrawService lineChartDrawService;
@@ -61,6 +65,7 @@ public class MainController implements Initializable {
         timerService.init(timerArea);
         temperatureDrawService.init(tempField);
         infoService.init(info);
+        differenceCalculationService.init(delta, normalChart);
 
         setUpCss();
     }
@@ -83,6 +88,9 @@ public class MainController implements Initializable {
     public void startShowChart() {
         timerService.start();
         lineChartDrawService.start();
+        if (differenceCalculationService.isLoadChart()) {
+            differenceCalculationService.drawDelta();
+        }
     }
 
     @FXML
@@ -104,7 +112,13 @@ public class MainController implements Initializable {
         lineChartDrawService.stop();
         lineChartDrawService.clear();
         chartLoadService.loadItems();
+        differenceCalculationService.clear();
         chartLoadService.clearLoadChartsUuids();
+    }
+
+    @FXML
+    public void chooseNormalChart() {
+        differenceCalculationService.chooseNormalChart();
     }
 
     @FXML

@@ -36,6 +36,10 @@ public class ArduinoService extends Task<Void> {
     @Override
     protected Void call() {
         try {
+            infoService.showError(
+                    translator.getMessage("thermocouple.not_connect"),
+                    10000
+            );
             createConnect();
             if (connect) {
                 readTemperature();
