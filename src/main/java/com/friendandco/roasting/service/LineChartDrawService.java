@@ -51,39 +51,37 @@ public class LineChartDrawService {
     }
 
     public void start() {
-        if (stop) {
-            clearDate(false);
-            stop = false;
-            drawChart = new Task<>() {
-                @Override
-                protected Void call() throws Exception {
-                    while (!stop) {
-                        if (!pause) {
-                            double xValue = (double) timerService.getCount().get() / SECONDS_IN_MINUTE;
-                            int yValue = arduinoService.getCurrentTemperature();
-                            Platform.runLater(() ->
-                                    dataChart.getData().add(
-                                            new XYChart.Data<>(
-                                                    xValue,
-                                                    yValue
-                                            )
-                                    )
-                            );
-                            if (xValue >= xAxis.getUpperBound()) {
-                                xAxis.setAutoRanging(true);
-                            }
-                            if (yValue >= yAxis.getUpperBound()) {
-                                yAxis.setAutoRanging(true);
-                            }
-                            Thread.sleep(1000);
+        stop = false;
+        clearDate(false);
+        drawChart = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                while (!stop) {
+                    if (!pause) {
+                        double xValue = (double) timerService.getCount().get() / SECONDS_IN_MINUTE;
+                        int yValue = arduinoService.getCurrentTemperature();
+                        Platform.runLater(() ->
+                                dataChart.getData().add(
+                                        new XYChart.Data<>(
+                                                xValue,
+                                                yValue
+                                        )
+                                )
+                        );
+                        if (xValue >= xAxis.getUpperBound()) {
+                            xAxis.setAutoRanging(true);
                         }
-
+                        if (yValue >= yAxis.getUpperBound()) {
+                            yAxis.setAutoRanging(true);
+                        }
+                        Thread.sleep(1000);
                     }
-                    return null;
+
                 }
-            };
-            threadPool.getService().submit(drawChart);
-        }
+                return null;
+            }
+        };
+        threadPool.getService().submit(drawChart);
     }
 
     public void pause() {
@@ -91,7 +89,7 @@ public class LineChartDrawService {
     }
 
     public void stop() {
-        stop = !stop;
+        stop = true;
     }
 
     public void clear() {
@@ -138,7 +136,7 @@ public class LineChartDrawService {
         prepareAxis(
                 yAxis,
                 settings.getYAxis(),
-                String.format(translator.getMessage("chart.y"), settings.getValueTemperature())
+                String.format(translator.getMessage("chart.y"), settings.getTemperatureUnits().getDesignation())
         );
     }
 

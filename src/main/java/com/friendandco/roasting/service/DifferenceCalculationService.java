@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -29,15 +30,18 @@ public class DifferenceCalculationService {
     private final Translator translator;
 
     @Getter
-    private final Map<Double, Integer> dataMap = new HashMap<>();
+    private final Map<Integer, Integer> dataMap = new HashMap<>();
     @Getter
     private boolean loadChart = false;
 
-    private TextField textField;
+    private TextField delta;
+    private TextField normTemp;
     private ChoiceBox<String> normalChart;
+    private boolean stop = false;
 
-    public void init(TextField textField, ChoiceBox<String> normalChart) {
-        this.textField = textField;
+    public void init(TextField delta, TextField normTemp, ChoiceBox<String> normalChart) {
+        this.delta = delta;
+        this.normTemp = normTemp;
         this.normalChart = normalChart;
         normalChart.setOnAction(event -> loadNormalChart());
         fillDefaultValue();
@@ -47,25 +51,41 @@ public class DifferenceCalculationService {
         fillItems();
     }
 
-    public void drawDelta() {
+    public void drawDeltaAndNormTemp() {
         Task<Void> draw = new Task<>() {
             @Override
-            protected Void call() {
-                Platform.runLater(() -> {
-                    if (getDelta().isPresent()) {
-                        textField.setText(getDelta().get().toString());
-                    } else {
-                        textField.setText("No");
-                    }
-                });
+            protected Void call() throws Exception {
+                while (!stop) {
+                    Platform.runLater(() -> {
+                        Optional<Integer> delta = getDelta();
+                        if (delta.isPresent()) {
+                            DifferenceCalculationService.this.delta.setText(delta.get().toString());
+                        } else {
+                            DifferenceCalculationService.this.delta.setText("No");
+                        }
+
+                        Optional<Integer> norma = getNorma();
+                        if (norma.isPresent()) {
+                            normTemp.setText(norma.get().toString());
+                        } else {
+                            DifferenceCalculationService.this.delta.setText("No");
+                        }
+                    });
+                    Thread.sleep(1000);
+                }
                 return null;
             }
         };
         threadPoolFix.getService().submit(draw);
     }
 
+    //TODO при смене языка NPE
     private void loadNormalChart() {
         ConcurrentHashMap<String, XYChart.Series<Double, Integer>> loadCharts = chartLoadService.getLoadCharts();
+        if (loadCharts == null) {
+            return;
+        }
+
         if (loadCharts.isEmpty()) {
             fillDefaultValue();
             return;
@@ -74,18 +94,13 @@ public class DifferenceCalculationService {
         String selectedItem = normalChart.getSelectionModel().getSelectedItem();
         Optional.ofNullable(loadCharts.get(selectedItem))
                 .ifPresent(dataChart -> {
-                    dataChart.getData().forEach(
-                            data -> dataMap.put(data.getXValue(), data.getYValue()
-                            )
+                    AtomicInteger count = new AtomicInteger(0);
+                    dataChart.getData().forEach(data -> {
+                                dataMap.put(count.getAndIncrement(), data.getYValue());
+                            }
                     );
                     loadChart = true;
                 });
-    }
-
-    private Optional<Integer> getDelta() {
-        //ту надо доставать нужную позицию
-        return Optional.ofNullable(dataMap.get(0))
-                .map(normalTemp -> arduinoService.getCurrentTemperature() - normalTemp);
     }
 
     public void clear() {
@@ -93,14 +108,28 @@ public class DifferenceCalculationService {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                        textField.setText("");
-                        dataMap.clear();
-                        loadChart = false;
+                    delta.setText("");
+                    dataMap.clear();
+                    loadChart = false;
+                    fillDefaultValue();
                 });
                 return null;
             }
         };
         threadPoolFix.getService().submit(clear);
+    }
+
+    public void stop() {
+        stop = true;
+    }
+
+    private Optional<Integer> getDelta() {
+        return Optional.ofNullable(dataMap.get(timerService.getCount().get()))
+                .map(normalTemp -> arduinoService.getCurrentTemperature() - normalTemp);
+    }
+
+    private Optional<Integer> getNorma() {
+        return Optional.ofNullable(dataMap.get(timerService.getCount().get()));
     }
 
     private void fillDefaultValue() {
@@ -123,3 +152,4 @@ public class DifferenceCalculationService {
 //TODO
 // 1 Стираются голочки
 // 2 заполнять данными по умолчанию нормально
+// 3 если нажать паузу а птом старат то сотрется график надо иправить

@@ -30,10 +30,6 @@ public class ItemChart {
         return this.on;
     }
 
-    public String onProperty2() {
-        return "Test";
-    }
-
     public final boolean isOn() {
         return this.onProperty().get();
     }

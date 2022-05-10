@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -33,22 +30,36 @@ import java.util.ResourceBundle;
 @NoArgsConstructor
 @SuppressWarnings("all") //TODO убрать только одно предупреждение не все
 public class MainController implements Initializable {
-    @FXML private TextField info;
     @FXML private BorderPane root;
+
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
+
+    @FXML private TextField info;
     @FXML private TextField delta;
     @FXML private TextField timerArea;
     @FXML private TextField tempField;
+    @FXML private TextField tempNormlChart;
+
     @FXML private ChoiceBox<String> locale;
     @FXML private ChoiceBox<String> normalChart;
+
     @FXML private ListView<ItemChart> listCharts;
     @FXML private LineChart<Double, Integer> chart;
+
+    @FXML private Spinner<Double> temperatureCoeff;
+    @FXML private Spinner<Integer> xStart;
+    @FXML private Spinner<Integer> yStart;
+    @FXML private Spinner<Integer> xEnd;
+    @FXML private Spinner<Integer> yEnd;
+//TODO переделать в нормальную кнопку слайдер
+    @FXML private Button temperatureUtils;
 
     @Autowired private DifferenceCalculationService differenceCalculationService;
     @Autowired private ConfigurableApplicationContext applicationContext;
     @Autowired private TemperatureDrawService temperatureDrawService;
     @Autowired private LineChartDrawService lineChartDrawService;
+    @Autowired private SettingsDrawService settingsDrawService;
     @Autowired private CssStyleProvider cssStyleProvider;
     @Autowired private StageInitializer stageInitializer;
     @Autowired private ChartLoadService chartLoadService;
@@ -65,7 +76,15 @@ public class MainController implements Initializable {
         timerService.init(timerArea);
         temperatureDrawService.init(tempField);
         infoService.init(info);
-        differenceCalculationService.init(delta, normalChart);
+        differenceCalculationService.init(delta, tempNormlChart, normalChart);
+        settingsDrawService.init(
+                temperatureUtils,
+                temperatureCoeff,
+                xStart,
+                yStart,
+                xEnd,
+                yEnd
+        );
 
         setUpCss();
     }
@@ -89,7 +108,7 @@ public class MainController implements Initializable {
         timerService.start();
         lineChartDrawService.start();
         if (differenceCalculationService.isLoadChart()) {
-            differenceCalculationService.drawDelta();
+            differenceCalculationService.drawDeltaAndNormTemp();
         }
     }
 
@@ -103,6 +122,7 @@ public class MainController implements Initializable {
     public void stopShowChart() {
         timerService.stop();
         lineChartDrawService.stop();
+        differenceCalculationService.stop();
     }
 
     @FXML
@@ -125,6 +145,11 @@ public class MainController implements Initializable {
     public void save(){
         stopShowChart();
         lineChartDrawService.save();
+    }
+
+    @FXML
+    public void saveSettings() {
+        settingsDrawService.save();
     }
 
     private void setUpCss() {

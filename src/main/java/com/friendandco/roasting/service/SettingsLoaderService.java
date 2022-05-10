@@ -16,27 +16,23 @@ public class SettingsLoaderService {
     private final String nameSettingsFile = "settings/settings.yaml";
 
     public Settings load() {
-        URL settingsUrl = getSettingsUrl();
-        if (settingsUrl == null) {
+        File settingsFile = getSettingsFile();
+        if (!settingsFile.exists()) {
             return getDefaultSettings();
         }
-        return read(settingsUrl);
+        return read(settingsFile);
     }
 
     public void writeSettings(Settings settings) {
-        URL settingsUrl = getSettingsUrl();
-        if (settingsUrl == null) {
-            File file = new File("./src/main/resources/settings/settings.yaml");
-            write(file, settings);
-        } else {
-            write(new File(settingsUrl.getFile()), settings);
-        }
+        File settingsFile = getSettingsFile();
+        write(settingsFile, settings);
     }
 
     private void write(File file, Settings settings) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
             if (!file.exists()) {
+                file.getParentFile().mkdirs();
                 if (file.createNewFile()) {
                     log.info("Create file: " + file.getName());
                 } else {
@@ -45,22 +41,22 @@ public class SettingsLoaderService {
             }
             objectMapper.writeValue(file, settings);
         } catch (IOException e) {
-            log.error(String.format("Settings can't write in file %s", nameSettingsFile), e.getMessage());
+            log.error(String.format("Settings can't write in file %s", nameSettingsFile), e);
         }
     }
 
-    private Settings read(URL settingsUrl) {
+    private Settings read(File settingsFile) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
-            return objectMapper.readValue(settingsUrl, Settings.class);
+            return objectMapper.readValue(settingsFile, Settings.class);
         } catch (Exception e) {
-            log.error(String.format("Settings can't load from file %s", nameSettingsFile), e.getMessage());
+            log.error(String.format("Settings can't load from file %s", nameSettingsFile), e);
             return getDefaultSettings();
         }
     }
 
-    private URL getSettingsUrl() {
-        return getClass().getClassLoader().getResource(nameSettingsFile);
+    private File getSettingsFile() {
+        return new File("./src/main/resources/settings/settings.yaml");
     }
 
     private Settings getDefaultSettings() {

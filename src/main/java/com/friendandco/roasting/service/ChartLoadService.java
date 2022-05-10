@@ -7,7 +7,6 @@ import com.friendandco.roasting.model.chart.Chart;
 import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.chart.Point;
-import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -39,7 +38,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ChartLoadService {
     private final String pathPackageForSave = "./src/main/resources/charts/";
-    private final Settings settings;
     private final Translator translator;
     private final InfoService infoService;
     private final ThreadPoolFix threadPool;
@@ -86,10 +84,10 @@ public class ChartLoadService {
         LineChartDone data = new LineChartDone();
         data.setName(lineChart.getTitle());
 
-        lineChart.getData().forEach(s -> {
+        lineChart.getData().forEach(itemData -> {
             Chart chart = new Chart();
-            chart.setName(s.getName());
-            s.getData().forEach(intData ->
+            chart.setName(itemData.getName());
+            itemData.getData().forEach(intData ->
                     chart.getPoints().add(
                             new Point(
                                     intData.getXValue(),
@@ -228,6 +226,7 @@ public class ChartLoadService {
         File file = new File(fullPath);
         try {
             if (!file.exists()) {
+                file.getParentFile().mkdirs();
                 if (!file.createNewFile()) {
                     log.warn("File " + file.getName() + "was not create");
                     //TODO тут надо выавать попап

@@ -13,4 +13,5 @@ import java.util.LinkedList;
 public class Chart implements Serializable {
     private String name;
     private LinkedList<Point> points = new LinkedList<>();
+    private int correctionFactor;
 }
