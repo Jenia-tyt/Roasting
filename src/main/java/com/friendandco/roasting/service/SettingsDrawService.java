@@ -1,5 +1,7 @@
 package com.friendandco.roasting.service;
 
+import com.friendandco.roasting.component.Translator;
+import com.friendandco.roasting.customView.CustomPopup;
 import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.model.settings.SettingsAxis;
 import com.friendandco.roasting.model.units.TemperatureUnits;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SettingsDrawService {
     private final Settings settings;
+    private final Translator translator;
 
     private Button tempUnits;
     private Spinner<Double> tempCoefficient;
@@ -25,6 +28,9 @@ public class SettingsDrawService {
     private Spinner<Integer> yEnd;
 
     private SimpleBooleanProperty switchedOn = new SimpleBooleanProperty(true);
+
+    private SpinnerValueFactory.IntegerSpinnerValueFactory rangeXStart;
+    private SpinnerValueFactory.IntegerSpinnerValueFactory rangeYStart;
 
     public void init(
             Button tempUnits,
@@ -69,11 +75,11 @@ public class SettingsDrawService {
         tempCoefficient.setValueFactory(coefficientRange);
 
         SettingsAxis xAxis = settings.getXAxis();
-        SpinnerValueFactory.IntegerSpinnerValueFactory rangeXStart = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 120);
+        rangeXStart = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 120);
         rangeXStart.setValue(xAxis.getLowerBound());
         xStart.setValueFactory(rangeXStart);
 
-        SpinnerValueFactory.IntegerSpinnerValueFactory rangeYStart = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 120);
+        rangeYStart = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 120);
         rangeYStart.setValue(xAxis.getUpperBound());
         xEnd.setValueFactory(rangeYStart);
 
@@ -89,12 +95,16 @@ public class SettingsDrawService {
 
     public void save() {
         settings.setCorrectionFactor(tempCoefficient.getValue());
-
         SettingsAxis xAxis = settings.getXAxis();
+        SettingsAxis yAxis = settings.getYAxis();
+
+        if (!checkAixs()) {
+            return;
+        }
+
         xAxis.setLowerBound(xStart.getValue());
         xAxis.setUpperBound(xEnd.getValue());
 
-        SettingsAxis yAxis = settings.getYAxis();
         yAxis.setLowerBound(yStart.getValue());
         yAxis.setUpperBound(yEnd.getValue());
 
@@ -104,6 +114,30 @@ public class SettingsDrawService {
                 return;
             }
         }
+    }
+
+    private boolean checkAixs() {
+        if (xStart.getValue() >= xEnd.getValue()) {
+            CustomPopup customPopup = new CustomPopup();
+            customPopup.createPopupWarning(
+                    translator.getMessage("warning"),
+                    String.format(translator.getMessage("warning.axis"), "X"),
+                    tempCoefficient.getScene().getWindow()
+            );
+            rangeXStart.setValue(xEnd.getValue() - 1);
+            return false;
+        }
+        if (yStart.getValue() >= yEnd.getValue()) {
+            CustomPopup customPopup = new CustomPopup();
+            customPopup.createPopupWarning(
+                    translator.getMessage("warning"),
+                    String.format(translator.getMessage("warning.axis"), "Y"),
+                    tempCoefficient.getScene().getWindow()
+            );
+            rangeYStart.setValue(yEnd.getValue() - 1);
+            return false;
+        }
+        return true;
     }
 
     private void drawCelsius() {
@@ -118,4 +152,3 @@ public class SettingsDrawService {
         tempUnits.setContentDisplay(ContentDisplay.LEFT);
     }
 }
-// TODO добавить валидацию что начало оси раньше конца в случае вызывать поп
