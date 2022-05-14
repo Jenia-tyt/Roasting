@@ -11,6 +11,18 @@ public class CssStyleProvider {
         return gerUrl("/css/viewlist.css").map(URL::toExternalForm);
     }
 
+    public Optional<String> getPopupWarningCss() {
+        return gerUrl("/css/popupWarning.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getPopupErrorCss() {
+        return gerUrl("/css/popupError.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getPopupInfoCss() {
+        return gerUrl("/css/popupInfo.css").map(URL::toExternalForm);
+    }
+
     private Optional<URL> gerUrl(String url) {
         return Optional.ofNullable(this.getClass().getResource((url)));
     }

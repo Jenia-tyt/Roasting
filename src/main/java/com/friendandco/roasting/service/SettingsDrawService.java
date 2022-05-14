@@ -1,5 +1,6 @@
 package com.friendandco.roasting.service;
 
+import com.friendandco.roasting.component.CssStyleProvider;
 import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.customView.CustomPopup;
 import com.friendandco.roasting.model.settings.Settings;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class SettingsDrawService {
     private final Settings settings;
     private final Translator translator;
+    private final CssStyleProvider cssStyleProvider;
 
     private Button tempUnits;
     private Spinner<Double> tempCoefficient;
@@ -122,7 +124,8 @@ public class SettingsDrawService {
             customPopup.createPopupWarning(
                     translator.getMessage("warning"),
                     String.format(translator.getMessage("warning.axis"), "X"),
-                    tempCoefficient.getScene().getWindow()
+                    tempCoefficient.getScene().getWindow(),
+                    cssStyleProvider
             );
             rangeXStart.setValue(xEnd.getValue() - 1);
             return false;
@@ -132,7 +135,8 @@ public class SettingsDrawService {
             customPopup.createPopupWarning(
                     translator.getMessage("warning"),
                     String.format(translator.getMessage("warning.axis"), "Y"),
-                    tempCoefficient.getScene().getWindow()
+                    tempCoefficient.getScene().getWindow(),
+                    cssStyleProvider
             );
             rangeYStart.setValue(yEnd.getValue() - 1);
             return false;
