@@ -2,7 +2,9 @@ package com.friendandco.roasting.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.friendandco.roasting.component.CssStyleProvider;
 import com.friendandco.roasting.component.Translator;
+import com.friendandco.roasting.customView.CustomPopup;
 import com.friendandco.roasting.model.chart.Chart;
 import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
@@ -39,21 +41,21 @@ import java.util.stream.Stream;
 public class ChartLoadService {
     private final String pathPackageForSave = "./src/main/resources/charts/";
     private final Translator translator;
-    private final InfoService infoService;
     private final ThreadPoolFix threadPool;
+    private final CssStyleProvider cssStyleProvider;
 
     private ListView<ItemChart> listView;
     private NumberAxis xAxis;
     private NumberAxis yAxis;
-    private LineChart<Double, Integer> lineChart;
+    private LineChart<Double, Double> lineChart;
     private ContextMenu cm;
     @Getter
-    private final ConcurrentHashMap<String, XYChart.Series<Double, Integer>> loadCharts = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap();
 
 
     public void init(
             ListView<ItemChart> listView,
-            LineChart<Double, Integer> lineChart,
+            LineChart<Double, Double> lineChart,
             NumberAxis xAxis,
             NumberAxis yAxis
     ) {
@@ -79,9 +81,18 @@ public class ChartLoadService {
         loadItems();
     }
 
-    //TODO добавить проверку что есть что сохранять на пустые даные
-    public void save(LineChart<Double, Integer> lineChart) {
+    public void save(LineChart<Double, Double> lineChart) {
         LineChartDone data = new LineChartDone();
+        if (data.getChart() == null) {
+            CustomPopup customPopup = new CustomPopup();
+            customPopup.createPopupWarning(
+                    translator.getMessage("warning"),
+                    translator.getMessage("chart.is.empty"),
+                    listView.getScene().getWindow(),
+                    cssStyleProvider
+            );
+            return;
+        }
         data.setName(lineChart.getTitle());
 
         lineChart.getData().forEach(itemData -> {
@@ -122,9 +133,12 @@ public class ChartLoadService {
 
     private void fillChart(LineChartDone chartDone) {
         if (checkLoadChart(chartDone)) {
-            infoService.showWarning(
-                    translator.getMessage("chart.it_is_same"),
-                    5000
+            CustomPopup customPopup = new CustomPopup();
+            customPopup.createPopupWarning(
+                    translator.getMessage("warning"),
+                    translator.getMessage("chart.it.is.same"),
+                    listView.getScene().getWindow(),
+                    cssStyleProvider
             );
             return;
         }
@@ -134,7 +148,7 @@ public class ChartLoadService {
                 Platform.runLater(() -> {
                             prepareAxis(chartDone);
 
-                            XYChart.Series<Double, Integer> dataChart = new XYChart.Series<>();
+                            XYChart.Series<Double, Double> dataChart = new XYChart.Series<>();
                             dataChart.setName(chartDone.getName());
                             chartDone.getChart().getPoints().forEach(point ->
                                     dataChart.getData().add(
@@ -230,7 +244,7 @@ public class ChartLoadService {
                 if (!file.createNewFile()) {
                     log.warn("File " + file.getName() + "was not create");
                     //TODO тут надо выавать попап
-                    // не правильно кладется имя не ту =да
+                    // не правильно кладется имя не туда
                 }
             }
             objectMapper.writeValue(file, lineChartDone);

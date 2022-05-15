@@ -30,7 +30,7 @@ public class DifferenceCalculationService {
     private final Translator translator;
 
     @Getter
-    private final Map<Integer, Integer> dataMap = new HashMap<>();
+    private final Map<Integer, Double> dataMap = new HashMap<>();
     @Getter
     private boolean loadChart = false;
 
@@ -38,6 +38,7 @@ public class DifferenceCalculationService {
     private TextField normTemp;
     private ChoiceBox<String> normalChart;
     private boolean stop = false;
+    private String nameLoadCharts;
 
     public void init(TextField delta, TextField normTemp, ChoiceBox<String> normalChart) {
         this.delta = delta;
@@ -57,14 +58,14 @@ public class DifferenceCalculationService {
             protected Void call() throws Exception {
                 while (!stop) {
                     Platform.runLater(() -> {
-                        Optional<Integer> delta = getDelta();
+                        Optional<Double> delta = getDelta();
                         if (delta.isPresent()) {
                             DifferenceCalculationService.this.delta.setText(delta.get().toString());
                         } else {
                             DifferenceCalculationService.this.delta.setText("No");
                         }
 
-                        Optional<Integer> norma = getNorma();
+                        Optional<Double> norma = getNorma();
                         if (norma.isPresent()) {
                             normTemp.setText(norma.get().toString());
                         } else {
@@ -79,9 +80,8 @@ public class DifferenceCalculationService {
         threadPoolFix.getService().submit(draw);
     }
 
-    //TODO при смене языка NPE
     private void loadNormalChart() {
-        ConcurrentHashMap<String, XYChart.Series<Double, Integer>> loadCharts = chartLoadService.getLoadCharts();
+        ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = chartLoadService.getLoadCharts();
         if (loadCharts == null) {
             return;
         }
@@ -91,13 +91,16 @@ public class DifferenceCalculationService {
             return;
         }
 
-        String selectedItem = normalChart.getSelectionModel().getSelectedItem();
-        Optional.ofNullable(loadCharts.get(selectedItem))
+        Optional.ofNullable(normalChart.getSelectionModel().getSelectedItem())
+                .flatMap(item -> {
+                    nameLoadCharts = item;
+                    return Optional.ofNullable(loadCharts.get(item));
+                })
                 .ifPresent(dataChart -> {
                     AtomicInteger count = new AtomicInteger(0);
-                    dataChart.getData().forEach(data -> {
-                                dataMap.put(count.getAndIncrement(), data.getYValue());
-                            }
+                    dataChart.getData().forEach(data ->
+                            dataMap.put(count.getAndIncrement(), data.getYValue()
+                            )
                     );
                     loadChart = true;
                 });
@@ -112,6 +115,7 @@ public class DifferenceCalculationService {
                     dataMap.clear();
                     loadChart = false;
                     fillDefaultValue();
+                    nameLoadCharts = null;
                 });
                 return null;
             }
@@ -123,12 +127,18 @@ public class DifferenceCalculationService {
         stop = true;
     }
 
-    private Optional<Integer> getDelta() {
+    public void reload () {
+        if (nameLoadCharts != null) {
+            normalChart.setValue(nameLoadCharts);
+        }
+    }
+
+    private Optional<Double> getDelta() {
         return Optional.ofNullable(dataMap.get(timerService.getCount().get()))
                 .map(normalTemp -> arduinoService.getCurrentTemperature() - normalTemp);
     }
 
-    private Optional<Integer> getNorma() {
+    private Optional<Double> getNorma() {
         return Optional.ofNullable(dataMap.get(timerService.getCount().get()));
     }
 
@@ -138,7 +148,7 @@ public class DifferenceCalculationService {
 
     private void fillItems() {
         normalChart.getItems().clear();
-        ConcurrentHashMap<String, XYChart.Series<Double, Integer>> loadCharts = chartLoadService.getLoadCharts();
+        ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = chartLoadService.getLoadCharts();
         if (!loadCharts.isEmpty()) {
             Enumeration<String> keys = loadCharts.keys();
             while (keys.hasMoreElements()) {

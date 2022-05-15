@@ -141,10 +141,8 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="%settings.temperature" />
                         <Label text="%settings.coefficient" GridPane.rowIndex="1" />
                         <Label text="%settings.x.start" GridPane.rowIndex="2" />
-                        <Button fx:id="temperatureUtils" mnemonicParsing="false" prefHeight="30.0" prefWidth="74.0" GridPane.columnIndex="1" />
                         <Spinner fx:id="temperatureCoeff" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Spinner GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="xStart" />
                         <Label text="%settings.y.start" GridPane.rowIndex="3" />
@@ -158,6 +156,8 @@
                               <Insets />
                            </GridPane.margin>
                         </Button>
+                        <Label text="%settings.port" />
+                        <ChoiceBox prefWidth="150.0" GridPane.columnIndex="1" />
                      </children>
                      <padding>
                         <Insets left="20.0" right="20.0" />
@@ -171,7 +171,7 @@
    <top>
       <HBox prefHeight="26.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
          <children>
-                  <MenuBar prefHeight="27.0" prefWidth="296.0">
+                  <MenuBar prefHeight="26.0" prefWidth="116.0">
                       <menus>
                           <Menu mnemonicParsing="false" text="%menu.info">
                               <items>
@@ -180,10 +180,10 @@
                           </Menu>
                       </menus>
                   </MenuBar>
-            <TextField id="info" fx:id="info" editable="false" prefHeight="27.0" prefWidth="1024.0" HBox.hgrow="ALWAYS" />
+            <TextField id="info" fx:id="info" editable="false" prefHeight="26.0" prefWidth="597.0" HBox.hgrow="ALWAYS" />
                   <ButtonBar id="buttonBar" centerShape="false" maxHeight="40.0" maxWidth="600.0" prefHeight="27.0">
                       <buttons>
-                          <ChoiceBox id="locale" fx:id="locale" onAction="#onChoseLocale" />
+                          <ChoiceBox id="locale" fx:id="locale" onAction="#onChoseLocale" prefHeight="26.0" prefWidth="80.0" />
                       </buttons>
                   </ButtonBar>
          </children>

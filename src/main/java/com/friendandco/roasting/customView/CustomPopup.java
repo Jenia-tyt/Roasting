@@ -44,7 +44,7 @@ public class CustomPopup {
         button.setOnAction(event -> popup.hide());
 
         dialogVbox.getChildren().add(new Text(titel));
-        dialogVbox.getChildren().add( new Text(message));
+        dialogVbox.getChildren().add(new Text(message));
         dialogVbox.getChildren().add(button);
         popup.getContent().add(dialogVbox);
 

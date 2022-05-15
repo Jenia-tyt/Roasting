@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 @Getter
 @Component
 @NoArgsConstructor
-@SuppressWarnings("all") //TODO убрать только одно предупреждение не все
+@SuppressWarnings("all")
 public class MainController implements Initializable {
     @FXML private BorderPane root;
 
@@ -45,15 +45,13 @@ public class MainController implements Initializable {
     @FXML private ChoiceBox<String> normalChart;
 
     @FXML private ListView<ItemChart> listCharts;
-    @FXML private LineChart<Double, Integer> chart;
+    @FXML private LineChart<Double, Double> chart;
 
     @FXML private Spinner<Double> temperatureCoeff;
     @FXML private Spinner<Integer> xStart;
     @FXML private Spinner<Integer> yStart;
     @FXML private Spinner<Integer> xEnd;
     @FXML private Spinner<Integer> yEnd;
-//TODO переделать в нормальную кнопку слайдер
-    @FXML private Button temperatureUtils;
 
     @Autowired private DifferenceCalculationService differenceCalculationService;
     @Autowired private ConfigurableApplicationContext applicationContext;
@@ -78,7 +76,6 @@ public class MainController implements Initializable {
         infoService.init(info);
         differenceCalculationService.init(delta, tempNormlChart, normalChart);
         settingsDrawService.init(
-                temperatureUtils,
                 temperatureCoeff,
                 xStart,
                 yStart,
@@ -101,6 +98,8 @@ public class MainController implements Initializable {
         ResourceBundle bundle = translator.getResourceBundleFromSettings();
 
         stageInitializer.initRootStage(stage, bundle);
+
+        differenceCalculationService.reload();
     }
 
     @FXML
@@ -147,6 +146,9 @@ public class MainController implements Initializable {
         lineChartDrawService.save();
     }
 
+    //TODO
+    // надо что бы сохраненые настройки сразу применялись
+    // сделать загрузку портов
     @FXML
     public void saveSettings() {
         settingsDrawService.save();

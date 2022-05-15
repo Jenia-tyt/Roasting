@@ -11,5 +11,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class Point implements Serializable {
     double x;
-    int y;
+    double y;
 }

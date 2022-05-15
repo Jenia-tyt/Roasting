@@ -12,5 +12,5 @@ public class GlobalConstant {
     public final static String READY_READ_TEMP = "READY";
     public final static String IO_USB_PORT = "IOUSBHostDevice (Dial-In)";
 //    C = 27.00 K = 80.60
-    public final static Pattern PATTERN_TEMPERATURE = Pattern.compile(String.format("^(.*C = (?<%s>\\d{2,3}).\\d{2} )(F = (?<%s>\\d{2,3}).\\d{2}.*)$", CELSIUS, FAHRENHEIT));
+    public final static Pattern PATTERN_TEMPERATURE = Pattern.compile(String.format("^(.*C = (?<%s>\\d{2,3}.\\d{1})\\d{1} )(F = (?<%s>\\d{2,3}.\\d{1})\\d{1}.*)$", CELSIUS, FAHRENHEIT));
 }

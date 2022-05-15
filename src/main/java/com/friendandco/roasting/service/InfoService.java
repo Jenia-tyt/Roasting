@@ -30,12 +30,13 @@ public class InfoService {
     }
 
     //TODO вынести все css в отдельный файл
+    //TODO переделать в прогрес бар и переименовать класс
     public void showError(String message, long time) {
         Task<Void> draw = new Task<>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    textField.setText(translator.getMessage("error") + ": " + message);
+                    textField.setText(translator.getMessage("error") + " " + message);
                     textField.setStyle("-fx-background-color: rgba(255, 69, 0)");
                     isShow = true;
                 });
@@ -56,7 +57,7 @@ public class InfoService {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    textField.setText(translator.getMessage("warning") + ": " + message);
+                    textField.setText(translator.getMessage("warning") + " " + message);
                     textField.setStyle("-fx-background-color: rgb(255,234,0)");
                     isShow = true;
                 });
@@ -77,7 +78,7 @@ public class InfoService {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    textField.setText(translator.getMessage("successfully") + ": " + message);
+                    textField.setText(translator.getMessage("successfully") + " " + message);
                     textField.setStyle("-fx-background-color: rgb(5,197,60)");
                     isShow = true;
                 });

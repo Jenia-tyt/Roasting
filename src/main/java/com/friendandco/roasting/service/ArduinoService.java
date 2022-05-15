@@ -3,6 +3,7 @@ package com.friendandco.roasting.service;
 import com.fazecast.jSerialComm.SerialPort;
 import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.constant.GlobalConstant;
+import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import javafx.concurrent.Task;
 import lombok.Getter;
@@ -22,12 +23,13 @@ import static com.friendandco.roasting.constant.GlobalConstant.IO_USB_PORT;
 @Service
 @RequiredArgsConstructor
 public class ArduinoService extends Task<Void> {
+    private final Settings settings;
     private final Translator translator;
     private final InfoService infoService;
     private final ThreadPoolFix threadPool;
     private final TemperatureDrawService temperatureDrawService;
 
-    private volatile int currentTemperature;
+    private volatile double currentTemperature;
     private boolean connect = false;
     private SerialPort port;
     private InputStream inputStream;
@@ -77,8 +79,9 @@ public class ArduinoService extends Task<Void> {
         createConnect();
     }
 
-    //TODO замена температуры и поправочный коэффициент если термо пара вообще ни чего не показывает
+    //TODO замена температуры и поправочный коэффициент
     private void readTemperature() throws Exception {
+        double correctionFactor = settings.getCorrectionFactor();
         try (Scanner scanner = new Scanner(inputStream)) {
             while (connect) {
                 String value = scanner.nextLine();
@@ -91,7 +94,7 @@ public class ArduinoService extends Task<Void> {
                     );
                 }
                 if (matcher.find() && temperatureDrawService.isInitDone() && readyReadTemp) {
-                    currentTemperature = Integer.parseInt(matcher.group(GlobalConstant.CELSIUS));
+                    currentTemperature = correctionFactor * Double.parseDouble(matcher.group(GlobalConstant.CELSIUS));
                     temperatureDrawService.draw(currentTemperature);
                 }
                 Thread.sleep(1000);

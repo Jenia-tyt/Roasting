@@ -5,10 +5,6 @@ import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.customView.CustomPopup;
 import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.model.settings.SettingsAxis;
-import com.friendandco.roasting.model.units.TemperatureUnits;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import lombok.RequiredArgsConstructor;
@@ -22,54 +18,27 @@ public class SettingsDrawService {
     private final Translator translator;
     private final CssStyleProvider cssStyleProvider;
 
-    private Button tempUnits;
     private Spinner<Double> tempCoefficient;
     private Spinner<Integer> xStart;
     private Spinner<Integer> yStart;
     private Spinner<Integer> xEnd;
     private Spinner<Integer> yEnd;
 
-    private SimpleBooleanProperty switchedOn = new SimpleBooleanProperty(true);
-
     private SpinnerValueFactory.IntegerSpinnerValueFactory rangeXStart;
     private SpinnerValueFactory.IntegerSpinnerValueFactory rangeYStart;
 
     public void init(
-            Button tempUnits,
             Spinner<Double> tempCoefficient,
             Spinner<Integer> xStart,
             Spinner<Integer> yStart,
             Spinner<Integer> xEnd,
             Spinner<Integer> yEnd
     ) {
-        this.tempUnits = tempUnits;
         this.tempCoefficient = tempCoefficient;
         this.xStart = xStart;
         this.yStart = yStart;
         this.xEnd = xEnd;
         this.yEnd = yEnd;
-
-
-        tempUnits.setOnAction(event -> switchedOn.set(!switchedOn.get()));
-
-        switchedOn.addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                drawCelsius();
-            } else {
-                drawFahrenheit();
-            }
-        });
-
-        TemperatureUnits temperatureUnits = settings.getTemperatureUnits();
-        switch (temperatureUnits) {
-            case CELSIUS:
-                drawCelsius();
-                break;
-            case FAHRENHEIT:
-                drawFahrenheit();
-                break;
-        }
-
 
         SpinnerValueFactory.DoubleSpinnerValueFactory coefficientRange = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 10.0);
         coefficientRange.setAmountToStepBy(0.1);
@@ -109,13 +78,6 @@ public class SettingsDrawService {
 
         yAxis.setLowerBound(yStart.getValue());
         yAxis.setUpperBound(yEnd.getValue());
-
-        for (TemperatureUnits units : TemperatureUnits.values()) {
-            if (units.getDesignation().equals(tempUnits.getText())) {
-                settings.setTemperatureUnits(units);
-                return;
-            }
-        }
     }
 
     private boolean checkAixs() {
@@ -142,17 +104,5 @@ public class SettingsDrawService {
             return false;
         }
         return true;
-    }
-
-    private void drawCelsius() {
-        tempUnits.setText(TemperatureUnits.CELSIUS.getDesignation());
-        tempUnits.setStyle("-fx-background-color: #6bc90e;-fx-text-fill:white;");
-        tempUnits.setContentDisplay(ContentDisplay.RIGHT);
-    }
-
-    private void drawFahrenheit() {
-        tempUnits.setText(TemperatureUnits.FAHRENHEIT.getDesignation());
-        tempUnits.setStyle("-fx-background-color: #bd2322;-fx-text-fill:white;");
-        tempUnits.setContentDisplay(ContentDisplay.LEFT);
     }
 }

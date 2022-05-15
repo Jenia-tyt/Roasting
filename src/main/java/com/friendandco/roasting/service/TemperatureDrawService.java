@@ -23,7 +23,7 @@ public class TemperatureDrawService {
         initDone = true;
     }
 
-    public void draw(int temp) {
+    public void draw(Double temp) {
         Task<Void> drawTempTask = new Task<>() {
             @Override
             protected Void call() {

@@ -30,18 +30,16 @@ public class LineChartDrawService {
     private Task<Void> drawChart;
     private boolean stop = true;
     private boolean pause = false;
-    private LineChart<Double, Integer> lineChart;
-    private XYChart.Series<Double, Integer> dataChart;
+    private LineChart<Double, Double> lineChart;
+    private XYChart.Series<Double, Double> dataChart;
 
-    public void init(LineChart<Double, Integer> lineChart, NumberAxis xAxis, NumberAxis yAxis) {
+    public void init(LineChart<Double, Double> lineChart, NumberAxis xAxis, NumberAxis yAxis) {
         this.lineChart = lineChart;
         this.xAxis = xAxis;
         this.yAxis = yAxis;
 
         //TODO
         // 1) сюда добавить название кофе которые жарится
-        // 3) сделать настройку графика в кладке настройки
-        // Подсчет отклонения
         prepareAxisFromSettings();
         lineChart.setCreateSymbols(false);
         lineChart.setTitle(DateTimeUtils.today());
@@ -59,7 +57,7 @@ public class LineChartDrawService {
                 while (!stop) {
                     if (!pause) {
                         double xValue = (double) timerService.getCount().get() / SECONDS_IN_MINUTE;
-                        int yValue = arduinoService.getCurrentTemperature();
+                        double yValue = arduinoService.getCurrentTemperature();
                         Platform.runLater(() ->
                                 dataChart.getData().add(
                                         new XYChart.Data<>(
