@@ -31,32 +31,30 @@ public class TimerService {
     }
 
     public void start() {
-        if (stop) {
-            stop = false;
-            Task<Void> showTimer = new Task<>() {
-                @Override
-                protected Void call() throws Exception {
-                    count = new AtomicInteger(0);
-                    LocalTime timer = LocalTime.MIDNIGHT;
-                    while (!stop) {
-                        if (!pause) {
-                            Platform.runLater(() ->
-                                    textArea.setText(
-                                            DateTimeUtils.getTimerTime(
-                                                    timer.plusSeconds(
-                                                            count.getAndIncrement()
-                                                    )
-                                            )
-                                    )
-                            );
-                            Thread.sleep(1000);
-                        }
+        stop = false;
+        Task<Void> showTimer = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                count = new AtomicInteger(0);
+                LocalTime timer = LocalTime.MIDNIGHT;
+                while (!stop) {
+                    if (!pause) {
+                        Platform.runLater(() ->
+                                textArea.setText(
+                                        DateTimeUtils.getTimerTime(
+                                                timer.plusSeconds(
+                                                        count.getAndIncrement()
+                                                )
+                                        )
+                                )
+                        );
+                        Thread.sleep(1000);
                     }
-                    return null;
                 }
-            };
-            threadPool.getService().submit(showTimer);
-        }
+                return null;
+            }
+        };
+        threadPool.getService().submit(showTimer);
     }
 
     public void pause() {

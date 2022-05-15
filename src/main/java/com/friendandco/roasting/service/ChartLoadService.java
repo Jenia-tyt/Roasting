@@ -45,9 +45,9 @@ public class ChartLoadService {
     private final CssStyleProvider cssStyleProvider;
 
     private ListView<ItemChart> listView;
+    private LineChart<Double, Double> lineChart;
     private NumberAxis xAxis;
     private NumberAxis yAxis;
-    private LineChart<Double, Double> lineChart;
     private ContextMenu cm;
     @Getter
     private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap();
@@ -112,6 +112,18 @@ public class ChartLoadService {
         loadItems();
     }
 
+    public void reload() {
+        loadCharts.keySet().forEach(this::setOnForReloadChart);
+    }
+
+    private void setOnForReloadChart(String nameChart) {
+        listView.getItems().forEach(chartItem -> {
+            if (nameChart.equals(chartItem.getName())) {
+                chartItem.setOn(true);
+            }
+        });
+    }
+
     private void chooseChart() {
         Optional.ofNullable(listView.getSelectionModel().selectedItemProperty().getValue())
                 .ifPresent(itemChart -> itemChart.setOn(!itemChart.isOn()));
@@ -132,16 +144,6 @@ public class ChartLoadService {
     }
 
     private void fillChart(LineChartDone chartDone) {
-        if (checkLoadChart(chartDone)) {
-            CustomPopup customPopup = new CustomPopup();
-            customPopup.createPopupWarning(
-                    translator.getMessage("warning"),
-                    translator.getMessage("chart.it.is.same"),
-                    listView.getScene().getWindow(),
-                    cssStyleProvider
-            );
-            return;
-        }
         Task<Void> draw = new Task<>() {
             @Override
             protected Void call() {
@@ -199,10 +201,6 @@ public class ChartLoadService {
         loadCharts.clear();
     }
 
-    private boolean checkLoadChart(LineChartDone chartDone) {
-        return loadCharts.containsKey(chartDone.getName());
-    }
-
     private List<ItemChart> getNameCharts() {
         try (Stream<Path> paths = Files.walk(Paths.get(pathPackageForSave))) {
             return paths
@@ -233,7 +231,6 @@ public class ChartLoadService {
     private void write(LineChartDone lineChartDone) {
         Random r = new Random();
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        //TODO на имени завязана логика удаления загурежнных графиков
         String saveName = lineChartDone.getName() + r.nextInt();
         lineChartDone.setName(saveName);
         String fullPath = pathPackageForSave + saveName + ".yaml";

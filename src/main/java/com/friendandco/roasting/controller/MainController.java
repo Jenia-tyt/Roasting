@@ -87,7 +87,7 @@ public class MainController implements Initializable {
     }
 
     //TODO
-    // При локализации пропадает график надо  брать данные
+    // При локализации пропадает график пергрузить актиыный график
     @FXML
     public void onChoseLocale() throws IOException {
         if (root.getScene() == null) {
@@ -100,6 +100,7 @@ public class MainController implements Initializable {
         stageInitializer.initRootStage(stage, bundle);
 
         differenceCalculationService.reload();
+        chartLoadService.reload();
     }
 
     @FXML
@@ -149,6 +150,7 @@ public class MainController implements Initializable {
     //TODO
     // надо что бы сохраненые настройки сразу применялись
     // сделать загрузку портов
+    // Баг с результующим графиком, нормально отображается только в самом начале потом не работате
     @FXML
     public void saveSettings() {
         settingsDrawService.save();

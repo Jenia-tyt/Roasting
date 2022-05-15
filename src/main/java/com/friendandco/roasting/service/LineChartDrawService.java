@@ -27,7 +27,6 @@ public class LineChartDrawService {
 
     private NumberAxis xAxis;
     private NumberAxis yAxis;
-    private Task<Void> drawChart;
     private boolean stop = true;
     private boolean pause = false;
     private LineChart<Double, Double> lineChart;
@@ -51,7 +50,7 @@ public class LineChartDrawService {
     public void start() {
         stop = false;
         clearDate(false);
-        drawChart = new Task<>() {
+        Task<Void> drawChart = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 while (!stop) {

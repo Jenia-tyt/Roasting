@@ -58,18 +58,18 @@ public class DifferenceCalculationService {
             protected Void call() throws Exception {
                 while (!stop) {
                     Platform.runLater(() -> {
-                        Optional<Double> delta = getDelta();
-                        if (delta.isPresent()) {
-                            DifferenceCalculationService.this.delta.setText(delta.get().toString());
+                        Optional<Double> deltaValue = getDelta();
+                        if (deltaValue.isPresent()) {
+                            delta.setText(deltaValue.get().toString());
                         } else {
-                            DifferenceCalculationService.this.delta.setText("No");
+                            delta.setText("No");
                         }
 
                         Optional<Double> norma = getNorma();
                         if (norma.isPresent()) {
                             normTemp.setText(norma.get().toString());
                         } else {
-                            DifferenceCalculationService.this.delta.setText("No");
+                            delta.setText("No");
                         }
                     });
                     Thread.sleep(1000);
@@ -112,6 +112,7 @@ public class DifferenceCalculationService {
             protected Void call() {
                 Platform.runLater(() -> {
                     delta.setText("");
+                    normTemp.setText("");
                     dataMap.clear();
                     loadChart = false;
                     fillDefaultValue();
@@ -160,6 +161,5 @@ public class DifferenceCalculationService {
     }
 }
 //TODO
-// 1 Стираются голочки
-// 2 заполнять данными по умолчанию нормально
+// Если нет загруженного графика то и результирующего тоже нет
 // 3 если нажать паузу а птом старат то сотрется график надо иправить
