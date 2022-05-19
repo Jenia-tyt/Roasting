@@ -23,6 +23,10 @@ public class CssStyleProvider {
         return gerUrl("/css/popupInfo.css").map(URL::toExternalForm);
     }
 
+    public Optional<String> getChartCss() {
+        return gerUrl("/css/chart.css").map(URL::toExternalForm);
+    }
+
     private Optional<URL> gerUrl(String url) {
         return Optional.ofNullable(this.getClass().getResource((url)));
     }

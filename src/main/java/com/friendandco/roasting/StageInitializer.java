@@ -49,11 +49,14 @@ public class StageInitializer implements ApplicationListener<StageReadyEvent> {
     }
 
     public void initRootStage(Stage stage, ResourceBundle bundle) throws IOException {
+        boolean isFullScreen = stage.isFullScreen();
+
         FXMLLoader fxmlLoader = applicationContext.getBean(BeanName.FXML_LOADER, FXMLLoader.class);
         fxmlLoader.setResources(bundle);
         fxmlLoader.setControllerFactory(applicationContext::getBean);
         Parent parent = fxmlLoader.load();
         stage.setScene(new Scene(parent));
+        stage.setFullScreen(isFullScreen);
         stage.setTitle(nameApp);
         stage.show();
     }

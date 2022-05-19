@@ -79,7 +79,6 @@ public class ArduinoService extends Task<Void> {
         createConnect();
     }
 
-    //TODO замена температуры и поправочный коэффициент
     private void readTemperature() throws Exception {
         double correctionFactor = settings.getCorrectionFactor();
         try (Scanner scanner = new Scanner(inputStream)) {

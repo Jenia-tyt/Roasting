@@ -29,8 +29,7 @@ public class InfoService {
         this.isInitDone = true;
     }
 
-    //TODO вынести все css в отдельный файл
-    //TODO переделать в прогрес бар и переименовать класс
+    //TODO переделать просто в полосу с текстом она будет отображаться только для термопары
     public void showError(String message, long time) {
         Task<Void> draw = new Task<>() {
             @Override

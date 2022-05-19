@@ -42,7 +42,9 @@ public class LineChartDrawService {
         prepareAxisFromSettings();
         lineChart.setCreateSymbols(false);
         lineChart.setTitle(DateTimeUtils.today());
-        dataChart = new XYChart.Series<>();
+        if (dataChart == null) {
+            dataChart = new XYChart.Series<>();
+        }
         dataChart.setName(translator.getMessage("chart.name"));
         lineChart.getData().add(dataChart);
     }
@@ -90,17 +92,17 @@ public class LineChartDrawService {
     }
 
     public void clear() {
-        Task<Void> clear = new Task<>() {
-            @Override
-            protected Void call() {
-                Platform.runLater(() -> {
-                    prepareAxisFromSettings();
-                    clearDate(true);
+        threadPool.getService().submit(
+                new Task<>() {
+                    @Override
+                    protected Void call() {
+                        Platform.runLater(() -> {
+                            prepareAxisFromSettings();
+                            clearDate(true);
+                        });
+                        return null;
+                    }
                 });
-                return null;
-            }
-        };
-        threadPool.getService().submit(clear);
     }
 
     public void save() {

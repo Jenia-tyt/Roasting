@@ -148,7 +148,6 @@ public class MainController implements Initializable {
     }
 
     //TODO
-    // надо что бы сохраненые настройки сразу применялись
     // сделать загрузку портов
     // Баг с результующим графиком, нормально отображается только в самом начале потом не работате
     @FXML
@@ -158,5 +157,6 @@ public class MainController implements Initializable {
 
     private void setUpCss() {
         cssStyleProvider.getListViewCss().ifPresent(css -> listCharts.getStylesheets().add(css));
+        cssStyleProvider.getChartCss().ifPresent(css -> chart.getStylesheets().add(css));
     }
 }

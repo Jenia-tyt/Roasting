@@ -227,7 +227,7 @@ public class ChartLoadService {
         }
     }
 
-    //TODO повторяющиесяяимена
+    //TODO повторяющиеся имена
     private void write(LineChartDone lineChartDone) {
         Random r = new Random();
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
