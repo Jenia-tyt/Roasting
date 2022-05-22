@@ -86,8 +86,6 @@ public class MainController implements Initializable {
         setUpCss();
     }
 
-    //TODO
-    // При локализации пропадает график пергрузить актиыный график
     @FXML
     public void onChoseLocale() throws IOException {
         if (root.getScene() == null) {
@@ -149,7 +147,11 @@ public class MainController implements Initializable {
 
     //TODO
     // сделать загрузку портов
+    // Сделать проверку лицензии
+    // Сделать автообновление приложение при загрузки
     // Баг с результующим графиком, нормально отображается только в самом начале потом не работате
+    // Слделать групповое удаление
+    // Если удалили загруженый график то он удаляется из загурженных
     @FXML
     public void saveSettings() {
         settingsDrawService.save();

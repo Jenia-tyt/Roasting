@@ -27,6 +27,22 @@ public class CssStyleProvider {
         return gerUrl("/css/chart.css").map(URL::toExternalForm);
     }
 
+    public Optional<String> getButtonCss() {
+        return gerUrl("/css/button.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getConfirmationCss() {
+        return gerUrl("/css/confirmation.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getEmptyCss() {
+        return gerUrl("/css/empty.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getFillChartNameCss() {
+        return gerUrl("/css/fillChartName.css").map(URL::toExternalForm);
+    }
+
     private Optional<URL> gerUrl(String url) {
         return Optional.ofNullable(this.getClass().getResource((url)));
     }

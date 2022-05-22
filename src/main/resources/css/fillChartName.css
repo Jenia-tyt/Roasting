@@ -1,0 +1,10 @@
+VBox {
+    -fx-background-color: rgba(138, 138, 148, 0.47);
+    -fx-font-size:15;
+    -fx-font-family: "Arial Narrow";
+    -fx-padding: 15px;
+    -fx-background-radius: 10;
+    -fx-border-color: #131313;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+}

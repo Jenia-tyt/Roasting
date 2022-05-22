@@ -10,19 +10,24 @@ import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.chart.Point;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
+import com.friendandco.roasting.utils.ViewUtils;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -50,7 +55,7 @@ public class ChartLoadService {
     private NumberAxis yAxis;
     private ContextMenu cm;
     @Getter
-    private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap();
+    private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap<>();
 
 
     public void init(
@@ -77,13 +82,12 @@ public class ChartLoadService {
                 }
             }
         });
-
         loadItems();
     }
 
-    public void save(LineChart<Double, Double> lineChart) {
-        LineChartDone data = new LineChartDone();
-        if (data.getChart() == null) {
+    public void save(LineChart<Double, Double> saveChart) {
+        ObservableList<XYChart.Series<Double, Double>> chartData = saveChart.getData();
+        if (chartData.get(0).getData().isEmpty()) {
             CustomPopup customPopup = new CustomPopup();
             customPopup.createPopupWarning(
                     translator.getMessage("warning"),
@@ -93,9 +97,105 @@ public class ChartLoadService {
             );
             return;
         }
-        data.setName(lineChart.getTitle());
+        fillChartName(saveChart);
+    }
 
-        lineChart.getData().forEach(itemData -> {
+    public void reload() {
+        loadCharts.keySet().forEach(this::setOnForReloadChart);
+    }
+
+    private void fillChartName(LineChart<Double, Double> saveChart) {
+        Popup popup = new Popup();
+
+        TextField textField = new TextField();
+        textField.setText(saveChart.getTitle());
+
+        Label label = new Label(translator.getMessage("chart.name.for.save"));
+
+        Button save = new Button(translator.getMessage("button.save"));
+        save.setOnAction(event -> {
+            popup.hide();
+            String nameChart = textField.getText();
+            if (StringUtils.isBlank(nameChart)) {
+                empty(saveChart);
+            } else if (isNormalName(nameChart)) {
+                saveData(saveChart, textField.getText());
+            } else {
+                confirmation(saveChart, textField.getText());
+            }
+        });
+        Button cansel = new Button(translator.getMessage("button.cansel"));
+        cansel.setOnAction(event -> popup.hide());
+
+        HBox hBox = ViewUtils.creatHBox(cansel, save);
+        VBox dialogVbox = ViewUtils.creatVBox(label, textField, hBox);
+
+        cssStyleProvider.getButtonCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+        cssStyleProvider.getFillChartNameCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+
+        popup.getContent().add(dialogVbox);
+        popup.show(lineChart.getScene().getWindow());
+    }
+
+    private void empty(LineChart<Double, Double> saveChart) {
+        Popup popup = new Popup();
+
+        Label message = new Label(translator.getMessage("empty.name.chart"));
+
+        Button ok = new Button("Ok");
+        ok.setOnAction(event -> {
+            popup.hide();
+            fillChartName(saveChart);
+        });
+        ok.setAlignment(Pos.CENTER);
+
+        VBox dialogVbox = ViewUtils.creatVBox(message, ok);
+
+        cssStyleProvider.getButtonCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+        cssStyleProvider.getEmptyCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+
+        popup.getContent().add(dialogVbox);
+        popup.show(listView.getScene().getWindow());
+    }
+
+    private void confirmation(LineChart<Double, Double> saveChart, String nameChart) {
+        Popup popup = new Popup();
+
+        Label message = new Label(translator.getMessage("confirmation"));
+
+        Button replace = new Button(translator.getMessage("button.replace"));
+        replace.setOnAction(event -> {
+            saveData(saveChart, nameChart);
+            popup.hide();
+        });
+
+        Button cansel = new Button(translator.getMessage("button.cansel"));
+        cansel.setOnAction(event -> {
+            fillChartName(saveChart);
+            popup.hide();
+        });
+
+        HBox hBox = ViewUtils.creatHBox(cansel, replace);
+        VBox dialogVbox = ViewUtils.creatVBox(message, hBox);
+
+        cssStyleProvider.getButtonCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+        cssStyleProvider.getConfirmationCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
+
+        popup.getContent().add(dialogVbox);
+        popup.show(listView.getScene().getWindow());
+    }
+
+    private boolean isNormalName(String nameChart) {
+        return getNameCharts().stream()
+                .map(ItemChart::getName)
+                .noneMatch(nameChart::equals);
+    }
+
+    private void saveData(LineChart<Double, Double> saveChart, String name) {
+        LineChartDone data = new LineChartDone();
+        data.setName(name);
+
+        saveChart.getData().forEach(itemData -> {
             Chart chart = new Chart();
             chart.setName(itemData.getName());
             itemData.getData().forEach(intData ->
@@ -108,12 +208,8 @@ public class ChartLoadService {
             );
             data.setChart(chart);
         });
-        write(data);
+        write(data, name);
         loadItems();
-    }
-
-    public void reload() {
-        loadCharts.keySet().forEach(this::setOnForReloadChart);
     }
 
     private void setOnForReloadChart(String nameChart) {
@@ -227,21 +323,16 @@ public class ChartLoadService {
         }
     }
 
-    //TODO повторяющиеся имена
-    private void write(LineChartDone lineChartDone) {
-        Random r = new Random();
+    private void write(LineChartDone lineChartDone, String name) {
         ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        String saveName = lineChartDone.getName() + r.nextInt();
-        lineChartDone.setName(saveName);
-        String fullPath = pathPackageForSave + saveName + ".yaml";
+        lineChartDone.setName(name);
+        String fullPath = pathPackageForSave + name + ".yaml";
         File file = new File(fullPath);
         try {
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
                 if (!file.createNewFile()) {
                     log.warn("File " + file.getName() + "was not create");
-                    //TODO тут надо выавать попап
-                    // не правильно кладется имя не туда
                 }
             }
             objectMapper.writeValue(file, lineChartDone);

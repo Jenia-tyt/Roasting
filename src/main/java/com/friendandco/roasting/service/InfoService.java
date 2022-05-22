@@ -57,7 +57,7 @@ public class InfoService {
             protected Void call() {
                 Platform.runLater(() -> {
                     textField.setText(translator.getMessage("warning") + " " + message);
-                    textField.setStyle("-fx-background-color: rgb(255,234,0)");
+                    textField.setStyle("-fx-background-color: rgba(255,234,0,0.5)");
                     isShow = true;
                 });
                 try {
@@ -82,7 +82,7 @@ public class InfoService {
                     isShow = true;
                 });
                 try {
-                    Thread.sleep(time); //TODO  выпадает ошибка разобраться
+                    Thread.sleep(time);
                     clear();
                 } catch (InterruptedException e) {
                     log.error("Error in show ok", e);
