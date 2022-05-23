@@ -25,7 +25,7 @@ import static com.friendandco.roasting.constant.GlobalConstant.IO_USB_PORT;
 public class ArduinoService extends Task<Void> {
     private final Settings settings;
     private final Translator translator;
-    private final InfoService infoService;
+    private final InfoArduinoService infoArduinoService;
     private final ThreadPoolFix threadPool;
     private final TemperatureDrawService temperatureDrawService;
 
@@ -38,10 +38,7 @@ public class ArduinoService extends Task<Void> {
     @Override
     protected Void call() {
         try {
-            infoService.showError(
-                    translator.getMessage("thermocouple.not_connect"),
-                    10000
-            );
+            infoArduinoService.notConnectInfo();
             createConnect();
             if (connect) {
                 readTemperature();
@@ -71,10 +68,7 @@ public class ArduinoService extends Task<Void> {
             }
         }
         connect = false;
-        infoService.showError(
-                translator.getMessage("thermocouple.not_connect"),
-                2000
-        );
+        infoArduinoService.notConnectInfo();
         Thread.sleep(2000);
         createConnect();
     }
@@ -87,10 +81,7 @@ public class ArduinoService extends Task<Void> {
                 Matcher matcher = GlobalConstant.PATTERN_TEMPERATURE.matcher(value);
                 if (!readyReadTemp && GlobalConstant.READY_READ_TEMP.equals(value)) {
                     readyReadTemp = true;
-                    infoService.showOk(
-                            translator.getMessage("thermocouple.connect"),
-                            5000
-                    );
+                    infoArduinoService.connectInfo();
                 }
                 if (matcher.find() && temperatureDrawService.isInitDone() && readyReadTemp) {
                     currentTemperature = correctionFactor * Double.parseDouble(matcher.group(GlobalConstant.CELSIUS));
@@ -106,10 +97,7 @@ public class ArduinoService extends Task<Void> {
             currentTemperature = 0;
             connect = false;
             readyReadTemp = false;
-            infoService.showError(
-                    translator.getMessage("thermocouple.not_connect"),
-                    2000
-            );
+            infoArduinoService.notConnectInfo();
             log.error("Data scanner thermocouple can not read value", e);
             createConnect();
         }

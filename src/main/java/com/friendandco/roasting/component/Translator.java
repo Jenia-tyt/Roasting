@@ -4,7 +4,6 @@ import com.friendandco.roasting.constant.GlobalConstant;
 import com.friendandco.roasting.model.settings.Settings;
 import javafx.scene.control.ChoiceBox;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;

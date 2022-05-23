@@ -39,6 +39,14 @@ public class CssStyleProvider {
         return gerUrl("/css/empty.css").map(URL::toExternalForm);
     }
 
+    public Optional<String> getConnectArduinoInfoCss() {
+        return gerUrl("/css/connectArduinoInfo.css").map(URL::toExternalForm);
+    }
+
+    public Optional<String> getNotConnectArduinoInfoCss() {
+        return gerUrl("/css/notConnectArduinoInfo.css").map(URL::toExternalForm);
+    }
+
     public Optional<String> getFillChartNameCss() {
         return gerUrl("/css/fillChartName.css").map(URL::toExternalForm);
     }

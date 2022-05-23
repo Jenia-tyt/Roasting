@@ -35,7 +35,8 @@ public class MainController implements Initializable {
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
 
-    @FXML private TextField info;
+    @FXML private Label info;
+
     @FXML private TextField delta;
     @FXML private TextField timerArea;
     @FXML private TextField tempField;
@@ -62,7 +63,7 @@ public class MainController implements Initializable {
     @Autowired private StageInitializer stageInitializer;
     @Autowired private ChartLoadService chartLoadService;
     @Autowired private TimerService timerService;
-    @Autowired private InfoService infoService;
+    @Autowired private InfoArduinoService infoArduinoService;
     @Autowired private Translator translator;
     @Autowired private Settings settings;
 
@@ -73,7 +74,7 @@ public class MainController implements Initializable {
         lineChartDrawService.init(chart, xAxis, yAxis);
         timerService.init(timerArea);
         temperatureDrawService.init(tempField);
-        infoService.init(info);
+        infoArduinoService.init(info);
         differenceCalculationService.init(delta, tempNormlChart, normalChart);
         settingsDrawService.init(
                 temperatureCoeff,
@@ -98,6 +99,7 @@ public class MainController implements Initializable {
         stageInitializer.initRootStage(stage, bundle);
 
         differenceCalculationService.reload();
+        infoArduinoService.reload();
         chartLoadService.reload();
     }
 

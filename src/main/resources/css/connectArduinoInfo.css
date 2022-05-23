@@ -1,0 +1,8 @@
+.label {
+    -fx-background-color: rgba(33, 162, 5, 0.5);
+    -fx-font-size:15;
+    -fx-text-fill: black;
+    -fx-font-family: "Arial Narrow";
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+}

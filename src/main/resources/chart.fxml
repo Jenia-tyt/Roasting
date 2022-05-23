@@ -4,7 +4,6 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -169,9 +168,17 @@
       </TabPane>
    </center>
    <top>
-      <HBox prefHeight="26.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
+      <GridPane prefHeight="28.0" prefWidth="1400.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="605.0" minWidth="0.0" prefWidth="106.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1286.0" minWidth="10.0" prefWidth="1208.0" />
+          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="224.0" minWidth="10.0" prefWidth="79.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
          <children>
-                  <MenuBar prefHeight="26.0" prefWidth="116.0">
+                  <MenuBar prefHeight="26.0" prefWidth="130.0">
                       <menus>
                           <Menu mnemonicParsing="false" text="%menu.info">
                               <items>
@@ -180,13 +187,9 @@
                           </Menu>
                       </menus>
                   </MenuBar>
-            <TextField id="info" fx:id="info" editable="false" prefHeight="26.0" prefWidth="597.0" HBox.hgrow="ALWAYS" />
-                  <ButtonBar id="buttonBar" centerShape="false" maxHeight="40.0" maxWidth="600.0" prefHeight="27.0">
-                      <buttons>
-                          <ChoiceBox id="locale" fx:id="locale" onAction="#onChoseLocale" prefHeight="26.0" prefWidth="80.0" />
-                      </buttons>
-                  </ButtonBar>
+                    <ChoiceBox id="locale" fx:id="locale" nodeOrientation="LEFT_TO_RIGHT" onAction="#onChoseLocale" prefHeight="26.0" prefWidth="76.0" GridPane.columnIndex="2" />
+            <Label fx:id="info" alignment="CENTER" prefHeight="28.0" prefWidth="1213.0" text="Label" GridPane.columnIndex="1" />
          </children>
-      </HBox>
+      </GridPane>
    </top>
 </BorderPane>
