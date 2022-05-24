@@ -10,7 +10,6 @@ import javafx.concurrent.Task;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.stage.FileChooser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +29,7 @@ public class LineChartDrawService {
     private NumberAxis yAxis;
     private boolean stop = true;
     private boolean pause = false;
+    private boolean start = false;
     private LineChart<Double, Double> lineChart;
     private XYChart.Series<Double, Double> dataChart;
 
@@ -51,6 +51,10 @@ public class LineChartDrawService {
     }
 
     public void start() {
+        if(start) {
+            return;
+        }
+        start = true;
         stop = false;
         clearDate(false);
         Task<Void> drawChart = new Task<>() {
@@ -89,6 +93,7 @@ public class LineChartDrawService {
     }
 
     public void stop() {
+        start = false;
         stop = true;
     }
 

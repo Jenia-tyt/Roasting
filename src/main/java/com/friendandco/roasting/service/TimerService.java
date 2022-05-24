@@ -24,6 +24,7 @@ public class TimerService {
 
     private boolean pause = false;
     private boolean stop = true;
+    private boolean start = false;
 
     public void init(TextField textArea) {
         this.textArea = textArea;
@@ -31,6 +32,10 @@ public class TimerService {
     }
 
     public void start() {
+        if(start) {
+            return;
+        }
+        start = true;
         stop = false;
         Task<Void> showTimer = new Task<>() {
             @Override
@@ -62,7 +67,8 @@ public class TimerService {
     }
 
     public void stop() {
-        stop = !stop;
+        stop = true;
+        start = false;
     }
 
     public void clear() {

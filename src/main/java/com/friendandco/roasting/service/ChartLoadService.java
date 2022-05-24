@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -48,6 +49,7 @@ public class ChartLoadService {
     private final Translator translator;
     private final ThreadPoolFix threadPool;
     private final CssStyleProvider cssStyleProvider;
+    private final BeanFactory beanFactory;
 
     private ListView<ItemChart> listView;
     private LineChart<Double, Double> lineChart;
@@ -268,11 +270,13 @@ public class ChartLoadService {
 
     private void removeItem() {
         Optional.ofNullable(listView.getSelectionModel().selectedItemProperty().getValue())
-                .ifPresent(name -> {
-                    File file = new File(pathPackageForSave + name + ".yaml");
+                .ifPresent(itemChart -> {
+                    File file = new File(pathPackageForSave + itemChart + ".yaml");
                     if (file.exists()) {
                         file.delete();
                     }
+                    itemChart.setOn(false);
+                    removeDifferenceChart();
                     loadItems();
                 });
     }
@@ -312,6 +316,7 @@ public class ChartLoadService {
                                             fillChart(loadChart(itemChart.getName()));
                                         } else {
                                             removeLoadChart(itemChart.getName());
+                                            removeDifferenceChart();
                                         }
                                     }
                             )
@@ -368,4 +373,16 @@ public class ChartLoadService {
                     }
                 });
     }
+
+    private void removeDifferenceChart() {
+        DifferenceCalculationService differenceCalculationService =
+                beanFactory.getBean(
+                        "differenceCalculationService",
+                        DifferenceCalculationService.class
+                );
+        if (differenceCalculationService.isLoadChart()) {
+            differenceCalculationService.clear();
+        }
+    }
+
 }

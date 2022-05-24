@@ -32,6 +32,8 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
     @FXML private BorderPane root;
 
+    @FXML private Menu topMenu;
+
     @FXML private NumberAxis xAxis;
     @FXML private NumberAxis yAxis;
 
@@ -46,6 +48,7 @@ public class MainController implements Initializable {
     @FXML private ChoiceBox<String> normalChart;
 
     @FXML private ListView<ItemChart> listCharts;
+
     @FXML private LineChart<Double, Double> chart;
 
     @FXML private Spinner<Double> temperatureCoeff;
@@ -54,16 +57,19 @@ public class MainController implements Initializable {
     @FXML private Spinner<Integer> xEnd;
     @FXML private Spinner<Integer> yEnd;
 
+    @FXML private Tooltip tooltip;
+
     @Autowired private DifferenceCalculationService differenceCalculationService;
     @Autowired private ConfigurableApplicationContext applicationContext;
     @Autowired private TemperatureDrawService temperatureDrawService;
     @Autowired private LineChartDrawService lineChartDrawService;
     @Autowired private SettingsDrawService settingsDrawService;
+    @Autowired private InfoArduinoService infoArduinoService;
     @Autowired private CssStyleProvider cssStyleProvider;
     @Autowired private StageInitializer stageInitializer;
     @Autowired private ChartLoadService chartLoadService;
+    @Autowired private TopMenuService topMenuService;
     @Autowired private TimerService timerService;
-    @Autowired private InfoArduinoService infoArduinoService;
     @Autowired private Translator translator;
     @Autowired private Settings settings;
 
@@ -83,6 +89,8 @@ public class MainController implements Initializable {
                 xEnd,
                 yEnd
         );
+        tooltip.setText(translator.getMessage("tooltip"));
+        topMenuService.init(topMenu, root);
 
         setUpCss();
     }
@@ -149,11 +157,11 @@ public class MainController implements Initializable {
 
     //TODO
     // сделать загрузку портов
+    // сделать авто подключение ардуино
     // Сделать проверку лицензии
     // Сделать автообновление приложение при загрузки
-    // Баг с результующим графиком, нормально отображается только в самом начале потом не работате
     // Слделать групповое удаление
-    // Если удалили загруженый график то он удаляется из загурженных
+    // Сделать таблицу о
     @FXML
     public void saveSettings() {
         settingsDrawService.save();
@@ -162,5 +170,9 @@ public class MainController implements Initializable {
     private void setUpCss() {
         cssStyleProvider.getListViewCss().ifPresent(css -> listCharts.getStylesheets().add(css));
         cssStyleProvider.getChartCss().ifPresent(css -> chart.getStylesheets().add(css));
+        cssStyleProvider.getDifferenceTextArea().ifPresent(css -> {
+            delta.getStylesheets().add(css);
+            tempNormlChart.getStylesheets().add(css);
+        });
     }
 }

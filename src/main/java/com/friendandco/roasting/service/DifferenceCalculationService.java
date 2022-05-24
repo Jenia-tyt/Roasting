@@ -30,7 +30,7 @@ public class DifferenceCalculationService {
     private final Translator translator;
 
     @Getter
-    private final Map<Integer, Double> dataMap = new HashMap<>();
+    private final Map<Integer, Double> dataChart = new HashMap<>();
     @Getter
     private boolean loadChart = false;
 
@@ -53,6 +53,7 @@ public class DifferenceCalculationService {
     }
 
     public void drawDeltaAndNormTemp() {
+        stop = false;
         Task<Void> draw = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -60,7 +61,7 @@ public class DifferenceCalculationService {
                     Platform.runLater(() -> {
                         Optional<Double> deltaValue = getDelta();
                         if (deltaValue.isPresent()) {
-                            delta.setText(deltaValue.get().toString());
+                            delta.setText(String.format("%.1f", deltaValue.get()).replace(',', '.'));
                         } else {
                             delta.setText("No");
                         }
@@ -99,7 +100,7 @@ public class DifferenceCalculationService {
                 .ifPresent(dataChart -> {
                     AtomicInteger count = new AtomicInteger(0);
                     dataChart.getData().forEach(data ->
-                            dataMap.put(count.getAndIncrement(), data.getYValue()
+                            this.dataChart.put(count.getAndIncrement(), data.getYValue()
                             )
                     );
                     loadChart = true;
@@ -113,7 +114,7 @@ public class DifferenceCalculationService {
                 Platform.runLater(() -> {
                     delta.setText("");
                     normTemp.setText("");
-                    dataMap.clear();
+                    dataChart.clear();
                     loadChart = false;
                     fillDefaultValue();
                     nameLoadCharts = null;
@@ -135,12 +136,12 @@ public class DifferenceCalculationService {
     }
 
     private Optional<Double> getDelta() {
-        return Optional.ofNullable(dataMap.get(timerService.getCount().get()))
+        return Optional.ofNullable(dataChart.get(timerService.getCount().get()))
                 .map(normalTemp -> arduinoService.getCurrentTemperature() - normalTemp);
     }
 
     private Optional<Double> getNorma() {
-        return Optional.ofNullable(dataMap.get(timerService.getCount().get()));
+        return Optional.ofNullable(dataChart.get(timerService.getCount().get()));
     }
 
     private void fillDefaultValue() {
@@ -160,7 +161,3 @@ public class DifferenceCalculationService {
         }
     }
 }
-//TODO
-// Если нет загруженного графика то и результирующего тоже нет
-// Если нажать паузу а потом старт то сотрется график надо исправить
-// проблема в том что запускается несколько потоков

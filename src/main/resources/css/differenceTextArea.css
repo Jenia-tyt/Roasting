@@ -1,0 +1,7 @@
+TextField{
+    -fx-background-color: white;
+    -fx-font-size: 40;
+    -fx-text-fill: black;
+    -fx-font-family: "Arial Narrow";
+    -fx-alignment: center;
+}

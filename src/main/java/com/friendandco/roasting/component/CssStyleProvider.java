@@ -47,6 +47,10 @@ public class CssStyleProvider {
         return gerUrl("/css/notConnectArduinoInfo.css").map(URL::toExternalForm);
     }
 
+    public Optional<String> getDifferenceTextArea() {
+        return gerUrl("/css/differenceTextArea.css").map(URL::toExternalForm);
+    }
+
     public Optional<String> getFillChartNameCss() {
         return gerUrl("/css/fillChartName.css").map(URL::toExternalForm);
     }

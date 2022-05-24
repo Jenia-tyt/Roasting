@@ -16,6 +16,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -53,7 +54,16 @@
                                        <font>
                                           <Font name="Arial Narrow Bold" size="90.0" />
                                        </font></TextField>
-                                    <Label text="Label" />
+                                    <GridPane>
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                    </GridPane>
+                                    <Label text="%chart.for.load" />
                                     <ListView id="test" fx:id="listCharts" prefHeight="194.0" prefWidth="350.0" />
                                     <HBox prefHeight="100.0" prefWidth="200.0">
                                        <children>
@@ -61,7 +71,10 @@
                                           <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#save" text="save" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
-                                    <ChoiceBox fx:id="normalChart" cache="true" cacheHint="SPEED" onMousePressed="#chooseNormalChart" prefHeight="26.0" prefWidth="350.0" />
+                                    <ChoiceBox fx:id="normalChart" cache="true" cacheHint="SPEED" onMousePressed="#chooseNormalChart" prefHeight="26.0" prefWidth="350.0">
+                                       <tooltip>
+                                          <Tooltip fx:id="tooltip" text="TEST" textAlignment="CENTER" />
+                                       </tooltip></ChoiceBox>
                                     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="409.0" text="%temp.coffee" />
                                     <TextField id="delta" fx:id="tempField" alignment="CENTER" prefHeight="146.0" prefWidth="350.0">
                                        <font>
@@ -71,7 +84,7 @@
                                       <items>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                              <children>
-                                                <Label alignment="CENTER" layoutX="53.0" layoutY="22.0" prefHeight="30.0" prefWidth="171.0" text="%temp.delta" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="53.0" layoutY="22.0" prefHeight="30.0" prefWidth="171.0" text="%temp.delta" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                 <TextField id="tempField" fx:id="delta" alignment="CENTER" layoutY="47.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
                                                    <font>
                                                       <Font size="60.0" />
@@ -80,7 +93,7 @@
                                           </AnchorPane>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                              <children>
-                                                <Label alignment="CENTER" layoutX="52.0" layoutY="14.0" prefHeight="28.0" prefWidth="171.0" text="%temp.normal" AnchorPane.bottomAnchor="102.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="52.0" layoutY="14.0" prefHeight="28.0" prefWidth="171.0" text="%temp.normal" AnchorPane.bottomAnchor="102.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                 <TextField fx:id="tempNormlChart" alignment="CENTER" prefHeight="145.0" prefWidth="152.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
                                                    <font>
                                                       <Font size="60.0" />
@@ -180,9 +193,9 @@
          <children>
                   <MenuBar prefHeight="26.0" prefWidth="130.0">
                       <menus>
-                          <Menu mnemonicParsing="false" text="%menu.info">
+                          <Menu fx:id="topMenu" mnemonicParsing="false" text="%menu.info">
                               <items>
-                                  <MenuItem mnemonicParsing="false" text="About" />
+                                  <MenuItem mnemonicParsing="false" text="%menu.item.about" />
                               </items>
                           </Menu>
                       </menus>
