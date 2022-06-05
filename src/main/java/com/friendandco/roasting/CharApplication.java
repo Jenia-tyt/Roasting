@@ -3,6 +3,8 @@ package com.friendandco.roasting;
 import com.friendandco.roasting.constant.BeanName;
 import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
+import com.friendandco.roasting.service.ChartLoadService;
+import com.friendandco.roasting.service.DifferenceCalculationService;
 import com.friendandco.roasting.service.SettingsLoaderService;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,6 +30,12 @@ public class CharApplication extends Application {
     public void stop() {
         Settings settings = applicationContext.getBean(BeanName.SETTINGS, Settings.class);
         SettingsLoaderService settingsLoaderService = applicationContext.getBean(BeanName.SETTINGS_LOADER, SettingsLoaderService.class);
+        ChartLoadService chartLoadService = applicationContext.getBean(BeanName.CHART_LOAD_SERVICE, ChartLoadService.class);
+        settings.getLoadCharts().clear();
+        settings.getLoadCharts().addAll(chartLoadService.getLoadCharts().keySet());
+        DifferenceCalculationService differenceCalculationService = applicationContext.getBean(BeanName.DIFFERENCE_CALCULATION_SERVICE, DifferenceCalculationService.class);
+        settings.setResultChart(differenceCalculationService.getNameLoadCharts());
+
         settingsLoaderService.writeSettings(settings);
 
         ThreadPoolFix threadPool = applicationContext.getBean(BeanName.THREAD_POOL, ThreadPoolFix.class);

@@ -1,6 +1,7 @@
 package com.friendandco.roasting.service;
 
 import com.friendandco.roasting.component.Translator;
+import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -28,6 +29,7 @@ public class DifferenceCalculationService {
     private final ThreadPoolFix threadPoolFix;
     private final TimerService timerService;
     private final Translator translator;
+    private final Settings settings;
 
     @Getter
     private final Map<Integer, Double> dataChart = new HashMap<>();
@@ -38,6 +40,7 @@ public class DifferenceCalculationService {
     private TextField normTemp;
     private ChoiceBox<String> normalChart;
     private boolean stop = false;
+    @Getter
     private String nameLoadCharts;
 
     public void init(TextField delta, TextField normTemp, ChoiceBox<String> normalChart) {
@@ -45,7 +48,19 @@ public class DifferenceCalculationService {
         this.normTemp = normTemp;
         this.normalChart = normalChart;
         normalChart.setOnAction(event -> loadNormalChart());
-        fillDefaultValue();
+        if (settings.getResultChart() != null) {
+            Optional.ofNullable(settings.getResultChart())
+                    .ifPresent(nameChart ->
+                            Optional.ofNullable(chartLoadService.getLoadCharts().get(nameChart))
+                                    .ifPresent(data -> {
+                                        loadData(data);
+                                        normalChart.setValue(nameChart);
+                                        nameLoadCharts = nameChart;
+                                    })
+                    );
+        } else {
+            fillDefaultValue();
+        }
     }
 
     public void chooseNormalChart() {
@@ -97,14 +112,7 @@ public class DifferenceCalculationService {
                     nameLoadCharts = item;
                     return Optional.ofNullable(loadCharts.get(item));
                 })
-                .ifPresent(dataChart -> {
-                    AtomicInteger count = new AtomicInteger(0);
-                    dataChart.getData().forEach(data ->
-                            this.dataChart.put(count.getAndIncrement(), data.getYValue()
-                            )
-                    );
-                    loadChart = true;
-                });
+                .ifPresent(this::loadData);
     }
 
     public void clear() {
@@ -159,5 +167,14 @@ public class DifferenceCalculationService {
         } else {
             fillDefaultValue();
         }
+    }
+
+    private void loadData(XYChart.Series<Double, Double> chr) {
+        AtomicInteger count = new AtomicInteger(0);
+        chr.getData().forEach(data ->
+                this.dataChart.put(count.getAndIncrement(), data.getYValue()
+                )
+        );
+        loadChart = true;
     }
 }

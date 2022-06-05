@@ -7,6 +7,7 @@ import com.friendandco.roasting.model.chart.Chart;
 import com.friendandco.roasting.model.chart.ItemChart;
 import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.chart.Point;
+import com.friendandco.roasting.model.settings.Settings;
 import com.friendandco.roasting.multiThread.ThreadPoolFix;
 import com.friendandco.roasting.utils.ViewUtils;
 import javafx.application.Platform;
@@ -52,11 +53,12 @@ import static com.friendandco.roasting.utils.SnakeyamlUtils.getDumperOptions;
 @Service
 @RequiredArgsConstructor
 public class ChartLoadService {
-    private final String pathPackageForSave = "./src/main/resources/charts/";
+    private final String pathPackageForSave = "./charts/";
     private final Translator translator;
-    private final ThreadPoolFix threadPool;
-    private final CssStyleProvider cssStyleProvider;
     private final BeanFactory beanFactory;
+    private final ThreadPoolFix threadPool;
+    private final Settings settings;
+    private final CssStyleProvider cssStyleProvider;
 
     private ListView<ItemChart> listView;
     private LineChart<Double, Double> lineChart;
@@ -91,6 +93,11 @@ public class ChartLoadService {
             }
         });
         loadItems();
+        settings.getLoadCharts().forEach(nameChart ->
+                Optional.ofNullable(loadChart(nameChart)).ifPresent(lineChartDone -> {
+                    loadCharts.put(nameChart, lineChartDoneToXYChart(lineChartDone));
+                    chooseChart(nameChart);
+                }));
     }
 
     public void save(LineChart<Double, Double> saveChart) {
@@ -172,6 +179,7 @@ public class ChartLoadService {
         Label message = new Label(translator.getMessage("confirmation"));
 
         Button replace = new Button(translator.getMessage("button.replace"));
+
         replace.setOnAction(event -> {
             saveData(saveChart, nameChart);
             popup.hide();
@@ -233,6 +241,13 @@ public class ChartLoadService {
                 .ifPresent(itemChart -> itemChart.setOn(!itemChart.isOn()));
     }
 
+    private void chooseChart(String nameChart) {
+        listView.getItems().stream()
+                .filter(name -> name.getName().equals(nameChart))
+                .findFirst()
+                .ifPresent(itemChart -> itemChart.setOn(true));
+    }
+
     private void removeLoadChart(String name) {
         Task<Void> test = new Task<>() {
             @Override
@@ -254,16 +269,7 @@ public class ChartLoadService {
                 Platform.runLater(() -> {
                             prepareAxis(chartDone);
 
-                            XYChart.Series<Double, Double> dataChart = new XYChart.Series<>();
-                            dataChart.setName(chartDone.getName());
-                            chartDone.getChart().getPoints().forEach(point ->
-                                    dataChart.getData().add(
-                                            new XYChart.Data<>(
-                                                    point.getX(),
-                                                    point.getY()
-                                            )
-                                    )
-                            );
+                            XYChart.Series<Double, Double> dataChart = lineChartDoneToXYChart(chartDone);
                             lineChart.getData().add(dataChart);
                             loadCharts.put(chartDone.getName(), dataChart);
                         }
@@ -390,5 +396,17 @@ public class ChartLoadService {
         if (differenceCalculationService.isLoadChart()) {
             differenceCalculationService.clear();
         }
+    }
+
+    private XYChart.Series<Double, Double> lineChartDoneToXYChart(LineChartDone chartDone) {
+        XYChart.Series<Double, Double> dataChart = new XYChart.Series<>();
+        dataChart.setName(chartDone.getName());
+        chartDone.getChart().getPoints().forEach(point ->
+                dataChart.getData().add(new XYChart.Data<>(
+                        point.getX(),
+                        point.getY()
+                ))
+        );
+        return dataChart;
     }
 }

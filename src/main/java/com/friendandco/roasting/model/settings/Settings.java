@@ -1,5 +1,6 @@
 package com.friendandco.roasting.model.settings;
 
+import com.friendandco.roasting.model.chart.LineChartDone;
 import com.friendandco.roasting.model.units.TemperatureUnits;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Setter
@@ -19,6 +22,8 @@ public class Settings implements Serializable {
     private SettingsAxis x;
     private SettingsAxis y;
     private double correctionFactor;
+    private List<String> loadCharts = new ArrayList<>();
+    private String resultChart;
 
     public Locale getLocale(){
         return Locale.forLanguageTag(languageTag);

@@ -8,14 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -25,36 +21,13 @@ public class Translator {
     private final Settings settings;
 
     public void init(ChoiceBox<String> locale) {
-        List<String> nameLanguage = getAllLocale()
-                .stream()
-                .map(Locale::getLanguage)
-                .collect(Collectors.toList());
-
-        locale.getItems().addAll(nameLanguage);
+        locale.getItems().addAll(Arrays.asList("ru", "en"));
         locale.setValue(settings.getLocale().getLanguage());
     }
 
     public String getMessage(String key) {
         ResourceBundle locale = getResourceBundleFromSettings();
         return locale.getString(key);
-    }
-
-    public List<Locale> getAllLocale() {
-        try (Stream<Path> paths = Files.walk(Paths.get("./src/main/resources"))) {
-            return paths
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .filter(file -> file.getName().startsWith("locale"))
-                    .map(file -> getLocaleProp(file.getName()))
-                    .filter(Objects::nonNull)
-                    .map(Locale::new)
-                    .collect(Collectors.toList());
-
-
-        } catch (IOException ioe) {
-            log.error(ioe.getMessage());
-            return new ArrayList<>();
-        }
     }
 
     public ResourceBundle getResourceBundleFromSettings() {

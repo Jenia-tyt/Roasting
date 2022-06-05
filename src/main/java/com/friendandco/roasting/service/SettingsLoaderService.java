@@ -3,35 +3,30 @@ package com.friendandco.roasting.service;
 import com.friendandco.roasting.model.settings.Settings;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 
 import static com.friendandco.roasting.utils.SnakeyamlUtils.getDumperOptions;
 
 @Slf4j
 @NoArgsConstructor
 public class SettingsLoaderService {
-    private final String nameSettingsFile = "settings/settings.yaml";
+    private final String nameSettingsFile = "./settings/settings.yaml";
 
     public Settings load() {
-        InputStream settingsFileStream = getSettingsFileStream();
-        if (settingsFileStream == null) {
+        File file = new File(nameSettingsFile);
+        if (!file.exists()) {
             log.info("Load default settings");
             return getDefaultSettings();
         }
-        return load(settingsFileStream);
+        return load(file);
     }
 
     public void writeSettings(Settings settings) {
-        String filePath = "./src/main/resources/settings/settings.yaml";
-        File file = new File(filePath);
+        File file = new File(nameSettingsFile);
         try {
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -49,21 +44,15 @@ public class SettingsLoaderService {
         }
     }
 
-    private Settings load(InputStream stream) {
+    private Settings load(File settingsFile) {
         Yaml yaml = new Yaml(new Constructor(Settings.class));
         yaml.setBeanAccess(BeanAccess.FIELD);
-        try {
-            return yaml.load(stream);
+        try (InputStream inputStream = new FileInputStream(settingsFile)) {
+            return yaml.load(inputStream);
         } catch (Exception e) {
             log.error(String.format("Settings can't load from file %s", nameSettingsFile), e);
             return getDefaultSettings();
         }
-    }
-
-    private InputStream getSettingsFileStream() {
-        return this.getClass()
-                .getClassLoader()
-                .getResourceAsStream(nameSettingsFile);
     }
 
     private Settings getDefaultSettings() {
