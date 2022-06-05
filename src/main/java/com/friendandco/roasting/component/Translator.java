@@ -40,7 +40,7 @@ public class Translator {
     }
 
     public List<Locale> getAllLocale() {
-        try(Stream<Path> paths = Files.walk(Paths.get("src/main/resources"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get("./src/main/resources"))) {
             return paths
                     .filter(Files::isRegularFile)
                     .map(Path::toFile)
@@ -59,9 +59,13 @@ public class Translator {
 
     public ResourceBundle getResourceBundleFromSettings() {
         Settings settings = applicationContext.getBean("settings", Settings.class);
+        String nameLocale = settings.getLocale().getLanguage();
         return ResourceBundle.getBundle(
-                "locale_" + settings.getLocale().getLanguage(),
-                settings.getLocale()
+                String.format(
+                        "locale_%s_%s",
+                        nameLocale,
+                        nameLocale.toUpperCase()
+                )
         );
     }
 

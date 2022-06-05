@@ -12,6 +12,9 @@ import java.util.Arrays;
 
 public class ViewUtils {
 
+    private ViewUtils() {
+    }
+
     public static HBox creatHBox(Node ... nodes) {
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);

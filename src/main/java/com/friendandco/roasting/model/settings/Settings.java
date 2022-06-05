@@ -1,6 +1,5 @@
 package com.friendandco.roasting.model.settings;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.friendandco.roasting.model.units.TemperatureUnits;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,22 +14,20 @@ import java.util.Locale;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Settings implements Serializable {
-    private String locale;
+    private String languageTag;
     private TemperatureUnits temperatureUnits;
-    @JsonProperty("xAxis")
-    private SettingsAxis xAxis;
-    @JsonProperty("yAxis")
-    private SettingsAxis yAxis;
+    private SettingsAxis x;
+    private SettingsAxis y;
     private double correctionFactor;
 
     public Locale getLocale(){
-        return Locale.forLanguageTag(locale);
+        return Locale.forLanguageTag(languageTag);
     }
 
     public void fileDefaultValue() {
-        locale = "ru";
+        languageTag = "ru";
         temperatureUnits = TemperatureUnits.CELSIUS;
-        xAxis = new SettingsAxis(
+        x = new SettingsAxis(
                 "x",
                 0,
                 15,
@@ -38,7 +35,7 @@ public class Settings implements Serializable {
                 false
         );
 
-        yAxis = new SettingsAxis(
+        y = new SettingsAxis(
                 "y",
                 0,
                 500,

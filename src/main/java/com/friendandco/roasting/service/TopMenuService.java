@@ -27,12 +27,15 @@ public class TopMenuService {
                 .setOnAction(event -> showAbout());
     }
 
-    //TODO нормально наполнить попап инфой
     private void showAbout() {
         VBox dialogVbox = new VBox(10);
         provider.getPopupInfoCss().ifPresent(css -> dialogVbox.getStylesheets().add(css));
 
-        Popup popup = ViewUtils.creatPopup("TEST", "message", dialogVbox);
+        Popup popup = ViewUtils.creatPopup(
+                translator.getMessage("about.title"),
+                translator.getMessage("about.info"),
+                dialogVbox
+        );
         popup.show(root.getScene().getWindow());
     }
 }

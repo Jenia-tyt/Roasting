@@ -45,7 +45,7 @@ public class SettingsDrawService {
         coefficientRange.setValue(settings.getCorrectionFactor());
         tempCoefficient.setValueFactory(coefficientRange);
 
-        SettingsAxis xAxis = settings.getXAxis();
+        SettingsAxis xAxis = settings.getX();
         rangeXStart = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 120);
         rangeXStart.setValue(xAxis.getLowerBound());
         xStart.setValueFactory(rangeXStart);
@@ -54,7 +54,7 @@ public class SettingsDrawService {
         rangeYStart.setValue(xAxis.getUpperBound());
         xEnd.setValueFactory(rangeYStart);
 
-        SettingsAxis yAxis = settings.getYAxis();
+        SettingsAxis yAxis = settings.getY();
         SpinnerValueFactory.IntegerSpinnerValueFactory rangeXEnd = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 600);
         rangeXEnd.setValue(yAxis.getLowerBound());
         yStart.setValueFactory(rangeXEnd);
@@ -66,8 +66,8 @@ public class SettingsDrawService {
 
     public void save() {
         settings.setCorrectionFactor(tempCoefficient.getValue());
-        SettingsAxis xAxis = settings.getXAxis();
-        SettingsAxis yAxis = settings.getYAxis();
+        SettingsAxis xAxis = settings.getX();
+        SettingsAxis yAxis = settings.getY();
 
         if (!checkAixs()) {
             return;

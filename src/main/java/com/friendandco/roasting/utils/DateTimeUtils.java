@@ -8,6 +8,9 @@ public class DateTimeUtils {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private static final DateTimeFormatter TIMER_FORMATTER = DateTimeFormatter.ofPattern("mm:ss");
 
+    private DateTimeUtils() {
+    }
+
     public static String today() {
         LocalDate localDate = LocalDate.now();
         return localDate.format(DATE_FORMATTER);

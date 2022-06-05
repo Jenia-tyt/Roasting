@@ -1,14 +1,19 @@
 package com.friendandco.roasting.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.friendandco.roasting.model.settings.Settings;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.PrintWriter;
+
+import static com.friendandco.roasting.utils.SnakeyamlUtils.getDumperOptions;
 
 @Slf4j
 @NoArgsConstructor
@@ -16,20 +21,17 @@ public class SettingsLoaderService {
     private final String nameSettingsFile = "settings/settings.yaml";
 
     public Settings load() {
-        File settingsFile = getSettingsFile();
-        if (!settingsFile.exists()) {
+        InputStream settingsFileStream = getSettingsFileStream();
+        if (settingsFileStream == null) {
+            log.info("Load default settings");
             return getDefaultSettings();
         }
-        return read(settingsFile);
+        return load(settingsFileStream);
     }
 
     public void writeSettings(Settings settings) {
-        File settingsFile = getSettingsFile();
-        write(settingsFile, settings);
-    }
-
-    private void write(File file, Settings settings) {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+        String filePath = "./src/main/resources/settings/settings.yaml";
+        File file = new File(filePath);
         try {
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -39,24 +41,29 @@ public class SettingsLoaderService {
                     log.warn("File " + file.getName() + "was not create");
                 }
             }
-            objectMapper.writeValue(file, settings);
+            PrintWriter printWriter = new PrintWriter(file);
+            Yaml yaml = new Yaml(getDumperOptions());
+            yaml.dump(settings, printWriter);
         } catch (IOException e) {
             log.error(String.format("Settings can't write in file %s", nameSettingsFile), e);
         }
     }
 
-    private Settings read(File settingsFile) {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+    private Settings load(InputStream stream) {
+        Yaml yaml = new Yaml(new Constructor(Settings.class));
+        yaml.setBeanAccess(BeanAccess.FIELD);
         try {
-            return objectMapper.readValue(settingsFile, Settings.class);
+            return yaml.load(stream);
         } catch (Exception e) {
             log.error(String.format("Settings can't load from file %s", nameSettingsFile), e);
             return getDefaultSettings();
         }
     }
 
-    private File getSettingsFile() {
-        return new File("./src/main/resources/settings/settings.yaml");
+    private InputStream getSettingsFileStream() {
+        return this.getClass()
+                .getClassLoader()
+                .getResourceAsStream(nameSettingsFile);
     }
 
     private Settings getDefaultSettings() {

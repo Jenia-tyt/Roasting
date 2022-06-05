@@ -134,13 +134,13 @@ public class LineChartDrawService {
     private void prepareAxisFromSettings() {
         prepareAxis(
                 xAxis,
-                settings.getXAxis(),
+                settings.getX(),
                 String.format(translator.getMessage("chart.x"), translator.getMessage("time.value"))
         );
 
         prepareAxis(
                 yAxis,
-                settings.getYAxis(),
+                settings.getY(),
                 String.format(translator.getMessage("chart.y"), settings.getTemperatureUnits().getDesignation())
         );
     }

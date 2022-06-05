@@ -1,7 +1,5 @@
 package com.friendandco.roasting.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.friendandco.roasting.component.CssStyleProvider;
 import com.friendandco.roasting.component.Translator;
 import com.friendandco.roasting.customView.CustomPopup;
@@ -30,16 +28,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.friendandco.roasting.utils.SnakeyamlUtils.getDumperOptions;
 
 @Slf4j
 @Service
@@ -58,7 +65,6 @@ public class ChartLoadService {
     private ContextMenu cm;
     @Getter
     private final ConcurrentHashMap<String, XYChart.Series<Double, Double>> loadCharts = new ConcurrentHashMap<>();
-
 
     public void init(
             ListView<ItemChart> listView,
@@ -282,10 +288,10 @@ public class ChartLoadService {
     }
 
     private LineChartDone loadChart(String name) {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         try {
+            Yaml yaml = new Yaml(new Constructor(LineChartDone.class));
             File file = new File(pathPackageForSave + name + ".yaml");
-            return objectMapper.readValue(file, LineChartDone.class);
+            return yaml.load(new FileInputStream(file));
         } catch (Exception e) {
             log.error("Chart can't load " + e.getMessage());
             return null;
@@ -329,7 +335,6 @@ public class ChartLoadService {
     }
 
     private void write(LineChartDone lineChartDone, String name) {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
         lineChartDone.setName(name);
         String fullPath = pathPackageForSave + name + ".yaml";
         File file = new File(fullPath);
@@ -340,7 +345,9 @@ public class ChartLoadService {
                     log.warn("File " + file.getName() + "was not create");
                 }
             }
-            objectMapper.writeValue(file, lineChartDone);
+            PrintWriter printWriter = new PrintWriter(file);
+            Yaml yaml = new Yaml(getDumperOptions());
+            yaml.dump(lineChartDone, printWriter);
         } catch (IOException e) {
             log.error(String.format("Settings can't write in file %s", fullPath), e.getMessage());
         }
@@ -384,5 +391,4 @@ public class ChartLoadService {
             differenceCalculationService.clear();
         }
     }
-
 }

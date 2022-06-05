@@ -101,7 +101,7 @@ public class MainController implements Initializable {
             return;
         }
         Stage stage = (Stage) root.getScene().getWindow();
-        settings.setLocale(locale.getValue());
+        settings.setLanguageTag(locale.getValue());
         ResourceBundle bundle = translator.getResourceBundleFromSettings();
 
         stageInitializer.initRootStage(stage, bundle);
@@ -163,9 +163,12 @@ public class MainController implements Initializable {
     // Слделать групповое удаление
     // Падает лебел отклонения при разворачиании на полный экран
     // сделать что бы настройки лежали внутри jar
-    // сделать что бы запускался jar
-    // исключить не нужные зависимости что бы облегчить jar
-    // перпистаь получение yaml через snakeyaml, если вес будет работать то надо будет удалить зависимости jcson
+    // Призапске программы должны загружаться графики которые были уже загружены
+    // Если термопара не подключена не запускать старт
+    // Разобраться с тем что не выпадает язык
+    // Проблема с четением графиков
+    // Не меняется фон при jar
+    // Если отключить термо пару что бы не згрязнялся лог
     @FXML
     public void saveSettings() {
         settingsDrawService.save();
