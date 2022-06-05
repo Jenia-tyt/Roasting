@@ -32,6 +32,7 @@ public class InfoArduinoService {
             protected Void call() {
                 Platform.runLater(() -> {
                     label.setText(translator.getMessage("thermocouple.not_connect"));
+                    label.getStylesheets().clear();
                     cssStyleProvider.getNotConnectArduinoInfoCss().ifPresent(css -> label.getStylesheets().add(css));
                     connect = false;
                 });
@@ -47,6 +48,7 @@ public class InfoArduinoService {
             protected Void call() {
                 Platform.runLater(() -> {
                     label.setText(translator.getMessage("thermocouple.connect"));
+                    label.getStylesheets().clear();
                     cssStyleProvider.getConnectArduinoInfoCss().ifPresent(css -> label.getStylesheets().add(css));
                     connect = true;
                 });

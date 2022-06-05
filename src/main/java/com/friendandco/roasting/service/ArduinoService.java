@@ -60,7 +60,10 @@ public class ArduinoService extends Task<Void> {
                 if (serialPort.openPort()) {
                     port = serialPort;
                     connect = true;
-                    serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
+                    serialPort.setComPortTimeouts(
+                            SerialPort.TIMEOUT_READ_SEMI_BLOCKING,
+                            0, 0
+                    );
                     inputStream = serialPort.getInputStream();
                     readTemperature();
                     return;
@@ -69,7 +72,7 @@ public class ArduinoService extends Task<Void> {
         }
         connect = false;
         infoArduinoService.notConnectInfo();
-        Thread.sleep(2000);
+        Thread.sleep(500);
         createConnect();
     }
 

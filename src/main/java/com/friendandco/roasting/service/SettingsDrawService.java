@@ -79,7 +79,6 @@ public class SettingsDrawService {
         yAxis.setLowerBound(yStart.getValue());
         yAxis.setUpperBound(yEnd.getValue());
 
-        //TODO надо подумать как автоматом менять кофициент как менять отборажение графика уже понятно зщарелодить сцену наврено будет проблема в том что переключается язык
         CustomPopup info = new CustomPopup();
         info.createPopupInfo(
                 translator.getMessage("info"),

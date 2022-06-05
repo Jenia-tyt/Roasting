@@ -38,8 +38,6 @@ public class LineChartDrawService {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
 
-        //TODO
-        // 1) сюда добавить название кофе которые жарится
         prepareAxisFromSettings();
         lineChart.setCreateSymbols(false);
         lineChart.setTitle(DateTimeUtils.today());

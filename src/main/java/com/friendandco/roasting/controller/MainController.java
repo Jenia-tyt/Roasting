@@ -69,6 +69,7 @@ public class MainController implements Initializable {
     @Autowired private StageInitializer stageInitializer;
     @Autowired private ChartLoadService chartLoadService;
     @Autowired private TopMenuService topMenuService;
+    @Autowired private ArduinoService arduinoService;
     @Autowired private TimerService timerService;
     @Autowired private Translator translator;
     @Autowired private Settings settings;
@@ -113,10 +114,12 @@ public class MainController implements Initializable {
 
     @FXML
     public void startShowChart() {
-        timerService.start();
-        lineChartDrawService.start();
-        if (differenceCalculationService.isLoadChart()) {
-            differenceCalculationService.drawDeltaAndNormTemp();
+        if (arduinoService.isConnect()) {
+            timerService.start();
+            lineChartDrawService.start();
+            if (differenceCalculationService.isLoadChart()) {
+                differenceCalculationService.drawDeltaAndNormTemp();
+            }
         }
     }
 
@@ -164,11 +167,9 @@ public class MainController implements Initializable {
     // Падает лебел отклонения при разворачиании на полный экран
     // сделать что бы настройки лежали внутри jar
     // Призапске программы должны загружаться графики которые были уже загружены
-    // Если термопара не подключена не запускать старт
     // Разобраться с тем что не выпадает язык
     // Проблема с четением графиков
-    // Не меняется фон при jar
-    // Если отключить термо пару что бы не згрязнялся лог
+    // Надо подумать как автоматом менять кофициент как менять отборажение графика уже понятно зщарелодить сцену наврено будет проблема в том что переключается язык
     @FXML
     public void saveSettings() {
         settingsDrawService.save();
