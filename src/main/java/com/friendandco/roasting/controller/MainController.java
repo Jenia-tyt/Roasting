@@ -10,7 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -164,7 +170,6 @@ public class MainController implements Initializable {
     // Сделать проверку лицензии
     // Сделать автообновление приложение через лаунчер (проверять версию а потом проверять есть ли там новая версия, если есть то просто скачивать и заменять нужный jat так же там сделать обновление лицензии)
     // Слделать групповое удаление
-    // Падает лебел отклонения при разворачиании на полный экран
     // Надо подумать как автоматом менять кофициент как менять отборажение графика уже понятно зщарелодить сцену наврено будет проблема в том что переключается язык
     @FXML
     public void saveSettings() {
