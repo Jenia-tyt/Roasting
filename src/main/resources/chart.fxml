@@ -76,7 +76,7 @@
                                           <Tooltip fx:id="tooltip" text="TEST" textAlignment="CENTER" />
                                        </tooltip></ChoiceBox>
                                     <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="18.0" prefWidth="409.0" text="%temp.coffee" textAlignment="CENTER" />
-                                    <TextField id="delta" fx:id="tempField" alignment="CENTER" disable="true" prefHeight="146.0" prefWidth="350.0">
+                                    <TextField id="delta" fx:id="tempField" alignment="CENTER" editable="false" prefHeight="146.0" prefWidth="350.0">
                                        <font>
                                           <Font size="60.0" />
                                        </font></TextField>

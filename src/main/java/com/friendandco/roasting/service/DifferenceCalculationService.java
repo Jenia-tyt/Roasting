@@ -85,7 +85,7 @@ public class DifferenceCalculationService {
                         if (norma.isPresent()) {
                             normTemp.setText(norma.get().toString());
                         } else {
-                            delta.setText("No");
+                            normTemp.setText("No");
                         }
                     });
                     Thread.sleep(1000);

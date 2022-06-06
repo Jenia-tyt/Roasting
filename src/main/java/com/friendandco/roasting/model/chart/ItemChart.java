@@ -14,6 +14,10 @@ public class ItemChart {
         setOn(on);
     }
 
+    public ItemChart(String name) {
+        setName(name);
+    }
+
     public final StringProperty nameProperty() {
         return this.name;
     }

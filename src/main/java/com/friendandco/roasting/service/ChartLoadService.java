@@ -80,6 +80,7 @@ public class ChartLoadService {
         this.yAxis = yAxis;
         initContextMenu();
 
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setCellFactory(CheckBoxListCell.forListView(ItemChart::onProperty));
         listView.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton() && event.getClickCount() == 2) {
@@ -225,7 +226,7 @@ public class ChartLoadService {
             data.setChart(chart);
         });
         write(data, name);
-        loadItems();
+        addSaveItem(new ItemChart(name));
     }
 
     private void setOnForReloadChart(String nameChart) {
@@ -234,6 +235,10 @@ public class ChartLoadService {
                 chartItem.setOn(true);
             }
         });
+    }
+
+    private void addSaveItem(ItemChart itemChart) {
+        listView.getItems().add(itemChart);
     }
 
     private void chooseChart() {
@@ -281,16 +286,14 @@ public class ChartLoadService {
     }
 
     private void removeItem() {
-        Optional.ofNullable(listView.getSelectionModel().selectedItemProperty().getValue())
-                .ifPresent(itemChart -> {
-                    File file = new File(pathPackageForSave + itemChart + ".yaml");
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                    itemChart.setOn(false);
-                    removeDifferenceChart();
-                    loadItems();
-                });
+        listView.getSelectionModel().getSelectedItems().forEach(itemChart -> {
+            File file = new File(pathPackageForSave + itemChart.getName() + ".yaml");
+            if (file.exists()) {
+                file.delete();
+            }
+            removeDifferenceChart();
+        });
+        loadItems();
     }
 
     private LineChartDone loadChart(String name) {
